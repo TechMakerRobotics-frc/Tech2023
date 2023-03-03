@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
@@ -43,6 +42,8 @@ public class Drivetrain extends SubsystemBase {
 
     leftEncoder.setPositionConversionFactor(1);
     rightEncoder.setPositionConversionFactor(1);
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
 
     
   }
@@ -64,7 +65,10 @@ public class Drivetrain extends SubsystemBase {
     motorLeftRear.set(left);
     motorRightRear.set(right);
   }
-
+  public void resetEncoder(){
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
   public void setTankMotors(double left, double right) {
 
     SmartDashboard.putNumber("drive left power (%)", left * 100.0);
