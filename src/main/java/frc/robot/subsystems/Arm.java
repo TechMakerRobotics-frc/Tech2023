@@ -41,7 +41,7 @@ public class Arm extends SubsystemBase {
     // see note above in robotInit about commenting these out one by one to set
     // directions.
     motorRight.set(forward);
-    motorLeft.set(forward*-1);
+    //motorLeft.set(forward*-1);
     
   }
   public void resetEncoder(){
