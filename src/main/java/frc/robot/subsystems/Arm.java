@@ -21,12 +21,13 @@ public class Arm extends SubsystemBase {
   RelativeEncoder rightEncoder;
   /** Creates a new arm. */
   public Arm() {
+    motorLeft.restoreFactoryDefaults();
+    motorRight.restoreFactoryDefaults();
     motorLeft.setIdleMode(IdleMode.kBrake);
     motorRight.setIdleMode(IdleMode.kBrake);
     motorLeft.setInverted(true);
     leftEncoder = motorLeft.getEncoder();
     rightEncoder = motorRight.getEncoder();
-
     leftEncoder.setPositionConversionFactor(1);
     rightEncoder.setPositionConversionFactor(1);
     leftEncoder.setPosition(0);
@@ -35,13 +36,13 @@ public class Arm extends SubsystemBase {
     
   }
   public void setMotorPower(double forward) {
-    SmartDashboard.putNumber("Arm forward power (%)", forward * 100.0);
+    SmartDashboard.putNumber("Braço Potencia (%)", forward * 100.0);
 
 
     // see note above in robotInit about commenting these out one by one to set
     // directions.
     motorRight.set(forward);
-    //motorLeft.set(forward*-1);
+    motorLeft.set(forward);
     
   }
   public void resetEncoder(){
@@ -57,8 +58,8 @@ public class Arm extends SubsystemBase {
   }
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("ARM Left Encoder", getLeftEncoder());
-    SmartDashboard.putNumber("ARM Right Encoder", getRightEncoder());
+    SmartDashboard.putNumber("Braço Encoder Esquerda", getLeftEncoder());
+    SmartDashboard.putNumber("Braço Encoder Direita", getRightEncoder());
   }
 
 }

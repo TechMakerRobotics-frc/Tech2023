@@ -8,20 +8,27 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 public class Drivetrain extends SubsystemBase {
-  CANSparkMax  motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront,MotorType.kBrushless);
-  CANSparkMax  motorLeftRear = new CANSparkMax (DrivetrainConstants.kMotorLeftRear,MotorType.kBrushless);
-  CANSparkMax  motorRightFront = new CANSparkMax (DrivetrainConstants.kMotorRightFront,MotorType.kBrushless);
-  CANSparkMax  motorRightRear = new CANSparkMax (DrivetrainConstants.kMotorRightRear,MotorType.kBrushless);
+  private CANSparkMax  motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront,MotorType.kBrushless);
+  private CANSparkMax  motorLeftRear = new CANSparkMax (DrivetrainConstants.kMotorLeftRear,MotorType.kBrushless);
+  private CANSparkMax  motorRightFront = new CANSparkMax (DrivetrainConstants.kMotorRightFront,MotorType.kBrushless);
+  private CANSparkMax  motorRightRear = new CANSparkMax (DrivetrainConstants.kMotorRightRear,MotorType.kBrushless);
 
-  RelativeEncoder leftEncoder;
-  RelativeEncoder rightEncoder;
+  private RelativeEncoder leftEncoder;
+  private RelativeEncoder rightEncoder;
+
+  private AHRS navX;
   /** Creates a new Drivetrain. */
   public Drivetrain() {
+    motorLeftFront.restoreFactoryDefaults();
+    motorLeftRear.restoreFactoryDefaults();
+    motorRightFront.restoreFactoryDefaults();
+    motorRightRear.restoreFactoryDefaults();
     motorLeftFront.setIdleMode(IdleMode.kCoast);
     motorLeftRear.setIdleMode(IdleMode.kCoast);
     motorRightFront.setIdleMode(IdleMode.kCoast);
@@ -45,11 +52,15 @@ public class Drivetrain extends SubsystemBase {
     leftEncoder.setPosition(0);
     rightEncoder.setPosition(0);
 
+    navX = new AHRS(DrivetrainConstants.NAVX_PORT);
+    resetYaw();
+
+
     
   }
   public void setDriveMotors(double forward, double turn) {
-    SmartDashboard.putNumber("drive forward power (%)", forward * 100.0);
-    SmartDashboard.putNumber("drive turn power (%)", turn * 100.0);
+    SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
+    SmartDashboard.putNumber("Potencia Curva (%)", turn * 100.0);
 
     /*
      * positive turn = counter clockwise, so the left side goes backwards
@@ -57,8 +68,8 @@ public class Drivetrain extends SubsystemBase {
     double left = forward - turn;
     double right = forward + turn;
 
-    SmartDashboard.putNumber("drive left power (%)", left * 100.0);
-    SmartDashboard.putNumber("drive right power (%)", right * 100.0);
+    SmartDashboard.putNumber("Potencia Esquererda (%)", left * 100.0);
+    SmartDashboard.putNumber("Potencia Direita (%)", right * 100.0);
 
     // see note above in robotInit about commenting these out one by one to set
     // directions.
@@ -71,8 +82,8 @@ public class Drivetrain extends SubsystemBase {
   }
   public void setTankMotors(double left, double right) {
 
-    SmartDashboard.putNumber("drive left power (%)", left * 100.0);
-    SmartDashboard.putNumber("drive right power (%)", right * 100.0);
+    SmartDashboard.putNumber("Potencia Esquererda (%)", left * 100.0);
+    SmartDashboard.putNumber("Potencia Direita (%)", right * 100.0);
 
     // see note above in robotInit about commenting these out one by one to set
     // directions.
@@ -80,14 +91,21 @@ public class Drivetrain extends SubsystemBase {
     motorRightRear.set(right);
   }
   public double getRightEncoder(){
-    return rightEncoder.getPosition();
+    return (rightEncoder.getPosition()/DrivetrainConstants.kGearboxRatio)*DrivetrainConstants.kWheelDistance;
   }
   public double getLeftEncoder(){
-    return leftEncoder.getPosition();
+    return (leftEncoder.getPosition()/DrivetrainConstants.kGearboxRatio)*DrivetrainConstants.kWheelDistance;
+  }
+  public double getYaw() {
+		return navX.getYaw();
+	}
+  public void resetYaw(){
+    navX.reset();
   }
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Left Encoder", getLeftEncoder());
-    SmartDashboard.putNumber("Right Encoder", getRightEncoder());
+    SmartDashboard.putNumber("Distancia Esquerda", getLeftEncoder());
+    SmartDashboard.putNumber("Distancia Direita", getRightEncoder());
+    SmartDashboard.putNumber("Giro", getYaw());
   }
 }

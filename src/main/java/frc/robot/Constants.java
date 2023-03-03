@@ -1,6 +1,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.SPI;
 
 public final class Constants {
   /*
@@ -24,6 +25,10 @@ public final class Constants {
     public static final int kMotorRightFront = 3;
     public static final int kMotorRightRear = 4;
     public static final int kMotorCurrentLimit = 28;
+    public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
+    public static final double kGearboxRatio = 8.45;
+    public static final double kWheelDistance = 6*Math.PI*0.0254;//converte 1 volta da roda em metros
+
   }
   public static class IntakeConstants{
     public static final int kIntakeMotor = 9;
@@ -38,6 +43,8 @@ public final class Constants {
   public static class ArmConstants{
     public static final int kArmLeftMotor = 5;
     public static final int kArmRighrMotor = 6;
+    public static final int kGearRatio = 60;
+    
   }
 
 }
