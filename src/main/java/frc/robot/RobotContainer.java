@@ -3,6 +3,8 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.SetArmPosition;
+import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.SuperiorIntake;
@@ -72,15 +74,24 @@ public class RobotContainer {
     //Setando o braço pelos triggers do controle. 
     //TODO - Alterar para posições fixas com  o comando de botoes
     arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
-    
+    bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
+    bLevelMedium.onTrue(new SetArmPosition(arm,Position.Medium));
+    bLevelLow.onTrue(new SetArmPosition(arm,Position.Low));
+    bLevelHold.onTrue(new SetArmPosition(arm,Position.Hold));
+    bIntakeArm.onTrue(new SetArmPosition(arm,Position.Intake));
     //Seta elementos de intake com comandos do controles de  navegação
     //TODO Configurar para o comando  de botões
     m_driverController.a().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
     m_driverController.b().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
     m_driverController.x().onTrue(new InstantCommand(()->intake.releaseElement(),intake));
     
-
+    bIntakeCone.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
+    bIntakeCube.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
+    bIntakeRelease.onTrue(new InstantCommand(()->intake.releaseElement(),intake));
+    //bIntakeArm.onTrue(getAutonomousCommand())
   }
+
+  
 
   /**
    * Aqui retornamos o comando autonomo  que vamos usar. Caso só tenhamos um, retorna esse

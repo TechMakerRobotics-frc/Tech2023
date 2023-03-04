@@ -56,6 +56,7 @@ public final class Constants {
     public static final int kReturnTicks = 7;
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
+    public static final double kPower = 0.3;
 
     
   }
