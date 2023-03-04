@@ -21,7 +21,7 @@ public class RobotContainer {
   // Cria um objeto de cada subsistema
   private final Drivetrain drive = new Drivetrain();
   private final Arm arm  = new Arm();
-  private final SuperiorIntake intake = new SuperiorIntake();
+  private final SuperiorIntake intake;
 
   /**
   * Cria os controles para comandar
@@ -39,6 +39,7 @@ public class RobotContainer {
    * Sao configurados os sistemas, associados os comandos aos botões, etc
    * */
   public RobotContainer() {
+    intake = new SuperiorIntake(Element.None);
     // A função de Bindings que associa os eventos dos controles aos comandos
     configureBindings();
   }
@@ -66,6 +67,7 @@ public class RobotContainer {
   /**
    * Aqui retornamos o comando autonomo  que vamos usar. Caso só tenhamos um, retorna esse
    * Caso  tenhamos mais de um, captura no Dashboard qual usar
+   * Seta tambem o intake para saber qual elemento inicia no autonomo
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
