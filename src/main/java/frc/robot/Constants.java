@@ -24,7 +24,7 @@ public final class Constants {
     public static final int kMotorLeftRear = 2;
     public static final int kMotorRightFront = 3;
     public static final int kMotorRightRear = 4;
-    public static final int kMotorCurrentLimit = 28;
+    public static final int kMotorCurrentLimit = 40;
     public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
     public static final double kGearboxRatio = 8.45;
     public static final double kWheelDistance = 6*Math.PI*0.0254;//converte 1 volta da roda em metros
