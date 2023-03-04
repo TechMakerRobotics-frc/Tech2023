@@ -19,15 +19,15 @@ public class SuperiorIntake extends SubsystemBase {
     Cone(IntakeConstants.kIntakeCone,"Cone"),
     None(IntakeConstants.kIntakeStop,"Nada"),
     Cube(IntakeConstants.kIntakeCube,"Cubo");
-    private int direction;
+    private double direction;
     private String name;
 
-    Element(int direction, String name) {
+    Element(double direction, String name) {
         this.direction = direction;
         this.name = name;
     }
 
-    public int getDirection() {
+    public double getDirection() {
         return direction;
     }
     public String getName(){
@@ -37,22 +37,27 @@ public class SuperiorIntake extends SubsystemBase {
   private Element lastElement = Element.None;
   private double time;
   public SuperiorIntake() {
+    lastElement = Element.None;
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Brake);
+    motor.configOpenloopRamp(IntakeConstants.kRampRate);
   }
 
-  void intakeElement(Element element){
-    lastElement = element;
+  public void intakeElement(Element element){
     double timeout = 0;
-    if(element==Element.Cube)
-      timeout = IntakeConstants.kIntakeTimeCube;
-    if(element==Element.Cone)
-      timeout = IntakeConstants.kIntakeTimeCone;
-    
-    time = Timer.getFPGATimestamp()+timeout;
-    motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
+    if(lastElement==Element.None){
+      if(element==Element.Cube)
+        timeout = IntakeConstants.kIntakeTimeCube;
+      if(element==Element.Cone)
+        timeout = IntakeConstants.kIntakeTimeCone;
+      
+      lastElement = element;
+
+      time = Timer.getFPGATimestamp()+timeout;
+      motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
+    }
   }
-  void releaseElement(){
+  public void releaseElement(){
     if(lastElement!=Element.None){
       time = Timer.getFPGATimestamp()+1;
       motor.set(VictorSPXControlMode.PercentOutput, lastElement.getDirection()*-1);
