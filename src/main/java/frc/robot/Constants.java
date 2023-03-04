@@ -10,12 +10,18 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
-    public static final int kbuttonintakecolletcube = 9; /*cubo */
-    public static final int kbuttonintakecolletcone = 10; /*cone */
-    public static final int kbuttonintakerelease= 11; /*soltar */
-    public static final int kbuttonintakekelevel1 = 5;/*estaaçao nivel baixa  */
-    public static final int kbuttonintakekelevel2 =6;/*estaçao nivel  media */
-    public static final int kbuttonintakekelevel3 =7;/*estacao nivel alta */
+    public static final int kButtonIntakeCube = 9; /*cubo */
+    public static final int kButtonIntakeCone = 10; /*cone */
+    public static final int kButtonIntakeRelease= 11; /*soltar */
+    public static final int kButtonArmIntake = 12; //Braço na posição de intake
+    public static final int kButtonArmLevelHigh = 5;/*estaaçao nivel alta  */
+    public static final int kButtonArmLevelMedium =6;/*estaçao nivel  media */
+    public static final int kButtonArmLevelLow =7;/*estacao nivel baixa */
+    public static final int kButtonArmLevelHold = 8; //Braço recolhido
+    public static final int kButtonIntakeAuxDown = 3; //Baixa intake Auxiliar
+    public static final int kButtonIntakeAuxUp = 4; //Sobe intake auxiliar
+
+
   }
  
 

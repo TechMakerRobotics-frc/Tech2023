@@ -7,11 +7,13 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
-//import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * Essa classe junta todos os elementos do  robo e  gerencia os funcionamento geral,
@@ -32,8 +34,24 @@ public class RobotContainer {
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
-  //private final Joystick m_operatorControlller = new Joystick(OperatorConstants.kOperatorControllerPort);
- 
+  private final Joystick m_operatorControlller = new Joystick(OperatorConstants.kOperatorControllerPort);
+  //Cconfigura os eventos para o intake
+  Trigger bIntakeCone = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeCone);
+  Trigger bIntakeCube = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeCube);
+  Trigger bIntakeRelease = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeRelease);
+  Trigger bIntakeArm = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmIntake);
+  
+  //Configura os eventos de  posições do braço
+  Trigger bLevelHigh = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelHigh);
+  Trigger bLevelMedium = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelMedium);
+  Trigger bLevelLow = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelLow);
+  Trigger bLevelHold = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelHold);
+
+  //Configura os eventos do intake auxiliar
+  Trigger bIntakeAuxDown = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxDown);
+  Trigger bIntakeAuxUp = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxUp);
+
+
   /** 
    * Dentro do container é que são guardados organizados os elementos do robo.
    * Sao configurados os sistemas, associados os comandos aos botões, etc
@@ -56,11 +74,11 @@ public class RobotContainer {
     arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
     
     //Seta elementos de intake com comandos do controles de  navegação
-    //#TODO Configurar para o comando  de botões
+    //TODO Configurar para o comando  de botões
     m_driverController.a().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
     m_driverController.b().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
     m_driverController.x().onTrue(new InstantCommand(()->intake.releaseElement(),intake));
-
+    
 
   }
 
