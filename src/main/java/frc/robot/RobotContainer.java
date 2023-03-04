@@ -7,6 +7,7 @@ import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
 import edu.wpi.first.wpilibj.Joystick;
@@ -26,6 +27,7 @@ public class RobotContainer {
   private final Drivetrain drive = new Drivetrain();
   private final Arm arm  = new Arm();
   private final SuperiorIntake intake;
+  private final PDP pdp = new PDP();
 
   /**
   * Cria os controles para comandar

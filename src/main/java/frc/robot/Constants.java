@@ -39,14 +39,14 @@ public final class Constants {
   }
   public static class IntakeConstants{
     public static final int kIntakeMotor = 3;
-    public static final double kIntakeCube = 0.5;
-    public static final double kIntakeCone = -0.5;
+    public static final double kIntakeCube = 1;
+    public static final double kIntakeCone = -1;
     public static final double kIntakeCubeRevert = kIntakeCone;
     public static final double kIntakeConeRevert = kIntakeCube;
     public static final int kIntakeStop = 0;
     public static final double kIntakeTimeCone = 0.5;
-    public static final double kIntakeTimeCube = 0.2;
-    public static final double kRampRate = 0.3;
+    public static final double kIntakeTimeCube = 0.5;
+    public static final double kRampRate = 0.05;
 
   }
   public static class ArmConstants{
@@ -56,7 +56,7 @@ public final class Constants {
     public static final int kReturnTicks = 7;
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
-    public static final double kPower = 0.3;
+    public static final double kPower = 0.7;
 
     
   }

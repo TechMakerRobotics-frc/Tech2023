@@ -22,12 +22,10 @@ public class PDP extends SubsystemBase {
     SmartDashboard.putNumber("PDP Tensao", m_pdp.getVoltage());
     SmartDashboard.putNumber("PDP Temperatura", m_pdp.getTemperature());
     SmartDashboard.putNumber("PDP Total Corrent", m_pdp.getTotalCurrent());
-    SmartDashboard.putNumber("PDP Total Potencia", m_pdp.getTotalPower());
-    SmartDashboard.putNumber("PDP Total Energia",  m_pdp.getTotalEnergy());
     SmartDashboard.putNumber("PDP Corrente Esquerda 1", m_pdp.getCurrent(0));
     SmartDashboard.putNumber("PDP Corrente Esquerda 2", m_pdp.getCurrent(1));
-    SmartDashboard.putNumber("PDP Corrente Direita 1", m_pdp.getCurrent(19));
-    SmartDashboard.putNumber("PDP Corrente Direita 2", m_pdp.getCurrent(18));
+    SmartDashboard.putNumber("PDP Corrente Direita 1", m_pdp.getCurrent(14));
+    SmartDashboard.putNumber("PDP Corrente Direita 2", m_pdp.getCurrent(15));
 
 
 
