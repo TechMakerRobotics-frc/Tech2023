@@ -4,11 +4,13 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arm;
 
 public class SetArmPosition extends CommandBase {
+  boolean returning = false;
   public enum Position{
     Hold(ArmConstants.kHoldPosition),
     Low(ArmConstants.kLowPosition),
@@ -30,6 +32,10 @@ public class SetArmPosition extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     this.arm = arm;
     this.position = position;
+    //Testo se o braço está  retornando
+    //para que quando passar da posição do encoder, encerrar o comando
+    returning = (position==Position.Hold);
+    
     addRequirements(arm);
   }
 
@@ -40,14 +46,24 @@ public class SetArmPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(arm.getEncoder()>position.getPosition()){
-      arm.setMotorPower(ArmConstants.kPower);
+    SmartDashboard.putBoolean("Braco retornando", returning);
+    SmartDashboard.putNumber("Braco posicao desejada", position.getPosition());
+    double error = position.getPosition()-arm.getEncoder();
+    double output = error * ArmConstants.kp;
+    if(Math.abs(output)>ArmConstants.kPower){
+      if(output>0){
+        output = ArmConstants.kPower;
+      }
+      else
+        output = -ArmConstants.kPower;
     }
-    if(arm.getEncoder()<position.getPosition())
+    if(!returning){
+      arm.setMotorPower(output);
+    }
+    else
     {
-      arm.setMotorPower(ArmConstants.kPower*-1);
+      arm.setMotorPower(output);
     }
-    
   }
 
   // Called once the command ends or is interrupted.
@@ -57,6 +73,8 @@ public class SetArmPosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(arm.getEncoder())==Math.abs(position.getPosition());
+    if(!returning)
+      return (arm.getEncoder()>(position.getPosition()));
+    return (arm.getEncoder()<(position.getPosition()));
   }
 }

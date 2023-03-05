@@ -3,7 +3,6 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
@@ -59,6 +58,7 @@ public class RobotContainer {
   Trigger bIntakeAuxUp = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxUp);
 
 
+
   /** 
    * Dentro do container é que são guardados organizados os elementos do robo.
    * Sao configurados os sistemas, associados os comandos aos botões, etc
@@ -75,9 +75,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    drive.setDefaultCommand(new DriveCommand(m_driverController.getLeftY(),m_driverController.getRightX(), drive, arm));
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getLeftY(), m_driverController.getRightX(),!arm.getArmZero()), drive));
     //Setando o braço pelos triggers do controle. 
-    arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
+    intakeAux.setDefaultCommand(new RunCommand(()->intakeAux.setMotor((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), intakeAux));
     bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
     bLevelMedium.onTrue(new SetArmPosition(arm,Position.Medium));
     bLevelLow.onTrue(new SetArmPosition(arm,Position.Low));
@@ -96,6 +96,7 @@ public class RobotContainer {
     
     bIntakeAuxDown.onTrue(new InstantCommand(()->intakeAux.setIntake(true),intakeAux));
     bIntakeAuxUp.onTrue(new InstantCommand(()->intakeAux.setIntake(false),intakeAux));
+    m_driverController.back().onTrue(new InstantCommand(()->arm.resetEncoder(),arm));
   }
 
   

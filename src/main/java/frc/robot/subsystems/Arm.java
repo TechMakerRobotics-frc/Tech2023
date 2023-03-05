@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
     motorRight.setOpenLoopRampRate(ArmConstants.kRampRate);
 
     //Inverto o motor da esquerda para que girem juntos
-    motorRight.setInverted(true);
+    motorLeft.setInverted(true);
 
     //Associo os encoders, seto a razão de 1 volta e zero os mesmos
     leftEncoder = motorLeft.getEncoder();
@@ -64,7 +64,7 @@ public class Arm extends SubsystemBase {
   
   //Função  que captura  os encoders, fazendo uma media dos dois lados e dividindo pela redução
   public double getEncoder(){
-    return (((rightEncoder.getPosition()+leftEncoder.getPosition())/2)*ArmConstants.kGearRatio)*-1;
+    return (((rightEncoder.getPosition()+leftEncoder.getPosition())/2)*ArmConstants.kGearRatio);
   }
   public boolean getArmZero(){
     return (getEncoder()<ArmConstants.kZeroPosition);

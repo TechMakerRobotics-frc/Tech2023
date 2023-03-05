@@ -15,71 +15,74 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class Drivetrain extends SubsystemBase {
-  //Motores de tração
-  private CANSparkMax  motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront,MotorType.kBrushless);
-  private CANSparkMax  motorLeftRear = new CANSparkMax (DrivetrainConstants.kMotorLeftRear,MotorType.kBrushless);
-  private CANSparkMax  motorRightFront = new CANSparkMax (DrivetrainConstants.kMotorRightFront,MotorType.kBrushless);
-  private CANSparkMax  motorRightRear = new CANSparkMax (DrivetrainConstants.kMotorRightRear,MotorType.kBrushless);
+  // Motores de tração
+  private CANSparkMax motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront, MotorType.kBrushless);
+  private CANSparkMax motorLeftRear = new CANSparkMax(DrivetrainConstants.kMotorLeftRear, MotorType.kBrushless);
+  private CANSparkMax motorRightFront = new CANSparkMax(DrivetrainConstants.kMotorRightFront, MotorType.kBrushless);
+  private CANSparkMax motorRightRear = new CANSparkMax(DrivetrainConstants.kMotorRightRear, MotorType.kBrushless);
 
-  //Encoders. São utilizados os enconders internos dos motores
-  //Para maior precisão é usada a media dos dois motores
+  // Encoders. São utilizados os enconders internos dos motores
+  // Para maior precisão é usada a media dos dois motores
   private RelativeEncoder leftEncoder1, leftEncoder2;
   private RelativeEncoder rightEncoder1, rightEncoder2;
 
-  //Placa de navegação
+  // Placa de navegação
   private AHRS navX;
-
 
   /** Creates a new Drivetrain. */
   public Drivetrain() {
-    //Reseto qualquer configuração nos modulos e refaço elas do zero
+    // Reseto qualquer configuração nos modulos e refaço elas do zero
     motorLeftFront.restoreFactoryDefaults();
     motorLeftRear.restoreFactoryDefaults();
     motorRightFront.restoreFactoryDefaults();
     motorRightRear.restoreFactoryDefaults();
-    //Deixo os motores girarem livre para não tombar
+    // Deixo os motores girarem livre para não tombar
     motorLeftFront.setIdleMode(IdleMode.kCoast);
     motorLeftRear.setIdleMode(IdleMode.kCoast);
     motorRightFront.setIdleMode(IdleMode.kCoast);
     motorRightRear.setIdleMode(IdleMode.kCoast);
-    //Inverto o sentido da esquerda para rodarem iguais
+    // Inverto o sentido da esquerda para rodarem iguais
     motorLeftFront.setInverted(true);
     motorLeftRear.setInverted(true);
 
-    //Configuro a rampa de aceleração dos modulos
+    // Configuro a rampa de aceleração dos modulos
+    //Foi feita uma rampa manual - 05/03/2023 - 20:10
     /*motorLeftFront.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
     motorLeftRear.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
     motorRightFront.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
     motorRightRear.setOpenLoopRampRate(DrivetrainConstants.kRampRate);*/
 
-    //Limito a corrente dos motores por software para não desligar os fusiveis
-    motorLeftFront.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
-    motorLeftRear.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
-    motorRightFront.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
-    motorRightRear.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
+    // Limito a corrente dos motores por software para não desligar os fusiveis
+    /*
+     * motorLeftFront.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
+     * motorLeftRear.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
+     * motorRightFront.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
+     * motorRightRear.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
+     */
 
-    //Busco o objeto encoder de cada modulo e associo 
+    // Busco o objeto encoder de cada modulo e associo
     leftEncoder1 = motorLeftRear.getEncoder();
     rightEncoder1 = motorRightRear.getEncoder();
     leftEncoder2 = motorLeftFront.getEncoder();
     rightEncoder2 = motorRightFront.getEncoder();
-    
-    //Configuro o fator do encoder para 1 - 1 pulso por volta. 
+
+    // Configuro o fator do encoder para 1 - 1 pulso por volta.
     leftEncoder1.setPositionConversionFactor(1);
     rightEncoder1.setPositionConversionFactor(1);
     leftEncoder2.setPositionConversionFactor(1);
     rightEncoder2.setPositionConversionFactor(1);
-    
-    //Seto a posição para no começo
+
+    // Seto a posição para no começo
     resetEncoder();
 
-    //Associo a placa de navegação e reseto ela
+    // Associo a placa de navegação e reseto ela
     navX = new AHRS(DrivetrainConstants.NAVX_PORT);
     resetYaw();
 
   }
-  //Função principal, movimenta o robo para frente e com curva
-  public void setDriveMotors(double forward, double turn) {
+
+  // Função principal, movimenta o robo para frente e com curva
+  public void setDriveMotors(double forward, double turn, boolean reduce) {
     SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
     SmartDashboard.putNumber("Potencia Curva (%)", turn * 100.0);
 
@@ -88,64 +91,116 @@ public class Drivetrain extends SubsystemBase {
      */
     double left = forward - turn;
     double right = forward + turn;
+    setTankMotors(left, right, reduce);
 
-    SmartDashboard.putNumber("Potencia Esquerda (%)", left * 100.0);
-    SmartDashboard.putNumber("Potencia Direita (%)", right * 100.0);
-
-    motorLeftRear.set(left);
-    motorLeftFront.set(left);
-    motorRightRear.set(right);
-    motorRightFront.set(right);
   }
-  //Movimento em  modo de  tanque. Util para autonomo e equilibrio
-  public void setTankMotors(double left, double right) {
+
+  // Movimento em modo de tanque. Util para autonomo e equilibrio
+  public void setTankMotors(double left, double right, boolean reduce) {
 
     SmartDashboard.putNumber("Potencia Esquerda (%)", left * 100.0);
     SmartDashboard.putNumber("Potencia Direita (%)", right * 100.0);
 
+    /*
+     * Rotina de rampa
+     * A cada 20ms o defaultComand passa por essa rotina. Então o incremento  
+     * da rampa  é feito com base em um valor constante e não colocando diretamente 
+     * o valor dos  controles nas saidas. Assim tanto as aceleradas quanto as frenagens
+     * são suaves e evitam quedas
+     * 
+     */
+    double leftOutput = getLeftPower();
+    double rightOutput = getRightPower();
+    if (left > leftOutput) {
+      leftOutput = leftOutput + DrivetrainConstants.kRampRate;
+      if (leftOutput > left)
+        leftOutput = left;
+    } else if (left < leftOutput) {
+      leftOutput = leftOutput - DrivetrainConstants.kRampRate;
+      if (leftOutput < left)
+        leftOutput = left;
+    }
+    if (right > rightOutput) {
+      rightOutput = rightOutput + DrivetrainConstants.kRampRate;
+      if (rightOutput > right)
+        rightOutput = right;
+    } else if (right < rightOutput) {
+      rightOutput = rightOutput - DrivetrainConstants.kRampRate;
+      if (rightOutput < right)
+        rightOutput = right;
+    }
+    if(reduce){
+      if(leftOutput>0 && leftOutput > DrivetrainConstants.kMaxSpeedArmExtended){
+        leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      if(leftOutput<0 && leftOutput < (-DrivetrainConstants.kMaxSpeedArmExtended)){
+        leftOutput = -DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      if(rightOutput>0 && rightOutput > DrivetrainConstants.kMaxSpeedArmExtended){
+        rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      if(rightOutput<0 && rightOutput < (-DrivetrainConstants.kMaxSpeedArmExtended)){
+        rightOutput = -DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      
+    }
+
+    if (reduce && leftOutput > DrivetrainConstants.kMaxSpeedArmExtended)
+      leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+    if (reduce && rightOutput > DrivetrainConstants.kMaxSpeedArmExtended)
+      rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
     // see note above in robotInit about commenting these out one by one to set
     // directions.
-    motorLeftRear.set(left);
-    motorLeftFront.set(left);
-    motorRightRear.set(right);
-    motorRightFront.set(right);
+    motorLeftRear.set(leftOutput);
+    motorLeftFront.set(leftOutput);
+    motorRightRear.set(rightOutput);
+    motorRightFront.set(rightOutput);
   }
-  public double getLeftPower(){
-    return (motorLeftFront.get()+motorLeftRear.get())/2;
+
+  public double getLeftPower() {
+    return (motorLeftFront.get() + motorLeftRear.get()) / 2;
   }
-  public double getRightPower(){
-    return (motorRightFront.get()+motorRightRear.get())/2;
+
+  public double getRightPower() {
+    return (motorRightFront.get() + motorRightRear.get()) / 2;
   }
-  //função de reset dos encoders definindo ponto inicial do robo
-  public void resetEncoder(){
+
+  // função de reset dos encoders definindo ponto inicial do robo
+  public void resetEncoder() {
     leftEncoder1.setPosition(0);
     leftEncoder2.setPosition(0);
     rightEncoder1.setPosition(0);
     rightEncoder2.setPosition(0);
   }
+
   /*
-   * Funções para  pegar os encoders
+   * Funções para pegar os encoders
    * Essas funções retornam as medias dos dois encoders de cada lado
-   * Alem disso já faz a conta do numero de pulsos dividido pela razão da caixa de redução
+   * Alem disso já faz a conta do numero de pulsos dividido pela razão da caixa de
+   * redução
    * e multiplicado pelo perimetro da roda para ter o resultado em metros
    */
-  public double getRightEncoder(){
-    return ((rightEncoder1.getPosition()+rightEncoder2.getPosition())/2/DrivetrainConstants.kGearboxRatio)*DrivetrainConstants.kWheelDistance;
-  }
-  public double getLeftEncoder(){
-    return ((leftEncoder1.getPosition()+leftEncoder2.getPosition())/2/DrivetrainConstants.kGearboxRatio)*DrivetrainConstants.kWheelDistance;
+  public double getRightEncoder() {
+    return ((rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2 / DrivetrainConstants.kGearboxRatio)
+        * DrivetrainConstants.kWheelDistance;
   }
 
-  //Captura o angulo que o robo está apontando
+  public double getLeftEncoder() {
+    return ((leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2 / DrivetrainConstants.kGearboxRatio)
+        * DrivetrainConstants.kWheelDistance;
+  }
+
+  // Captura o angulo que o robo está apontando
   public double getYaw() {
-		return navX.getYaw();
-	}
-  //Zera a direção do  robo
-  public void resetYaw(){
+    return navX.getYaw();
+  }
+
+  // Zera a direção do robo
+  public void resetYaw() {
     navX.reset();
   }
 
-  //Periodico só  atualiza os dados no Dashboard para informações
+  // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Distancia Esquerda", getLeftEncoder());

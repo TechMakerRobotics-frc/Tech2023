@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AuxiliarIntakeConstants;
 /*
@@ -35,7 +36,9 @@ public class AuxiliarIntake extends SubsystemBase {
   public int getEncoder(){
     return encoder.get();
   }
-
+  public void setMotor(double power){
+    motor.set(ControlMode.PercentOutput,power);
+  }
   public void setIntake(boolean forward){
     if(getEncoder()<100 && forward){
       motor.set(ControlMode.PercentOutput,AuxiliarIntakeConstants.kMotorPower);
@@ -47,12 +50,13 @@ public class AuxiliarIntake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if(getEncoder()>AuxiliarIntakeConstants.kPulsesDown){
+    /*if(getEncoder()>AuxiliarIntakeConstants.kPulsesDown){
       motor.set(ControlMode.PercentOutput,0);
     }
     if(getEncoder()<20){
       motor.set(ControlMode.PercentOutput,0);
       resetEncoder();
-    }
+    }*/
+    SmartDashboard.putNumber("Intake Auxiliar",getEncoder());
   }
 }
