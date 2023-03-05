@@ -6,6 +6,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
@@ -28,6 +29,7 @@ public class RobotContainer {
   private final Arm arm  = new Arm();
   private final SuperiorIntake intake;
   private final PDP pdp = new PDP();
+  private final AuxiliarIntake intakeAux = new AuxiliarIntake();
 
   /**
   * Cria os controles para comandar
@@ -74,15 +76,15 @@ public class RobotContainer {
     //Seta a navegação padrão pelo  controle
     drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getLeftY(), m_driverController.getRightX()), drive));
     //Setando o braço pelos triggers do controle. 
-    //TODO - Alterar para posições fixas com  o comando de botoes
     arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
     bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
     bLevelMedium.onTrue(new SetArmPosition(arm,Position.Medium));
     bLevelLow.onTrue(new SetArmPosition(arm,Position.Low));
     bLevelHold.onTrue(new SetArmPosition(arm,Position.Hold));
     bIntakeArm.onTrue(new SetArmPosition(arm,Position.Intake));
+
     //Seta elementos de intake com comandos do controles de  navegação
-    //TODO Configurar para o comando  de botões
+
     m_driverController.a().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
     m_driverController.b().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
     m_driverController.x().onTrue(new InstantCommand(()->intake.releaseElement(),intake));
@@ -90,7 +92,9 @@ public class RobotContainer {
     bIntakeCone.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
     bIntakeCube.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
     bIntakeRelease.onTrue(new InstantCommand(()->intake.releaseElement(),intake));
-    //bIntakeArm.onTrue(getAutonomousCommand())
+    
+    bIntakeAuxDown.onTrue(new InstantCommand(()->intakeAux.setIntake(true),intakeAux));
+    bIntakeAuxUp.onTrue(new InstantCommand(()->intakeAux.setIntake(false),intakeAux));
   }
 
   

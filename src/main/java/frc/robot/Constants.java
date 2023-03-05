@@ -57,8 +57,14 @@ public final class Constants {
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
     public static final double kPower = 0.7;
+  }
 
-    
+  public static class AuxiliarIntakeConstants{
+    public static final int kIntakeMotor = 2;
+    public static final int kEncoderA = 0;
+    public static final int kEncoderB = 1;
+    public static final int kPulsesDown = 2048;
+    public static final double kMotorPower = 0.7;
   }
 
 }
