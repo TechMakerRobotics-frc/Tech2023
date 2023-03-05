@@ -47,10 +47,10 @@ public class Drivetrain extends SubsystemBase {
     motorLeftRear.setInverted(true);
 
     //Configuro a rampa de aceleração dos modulos
-    motorLeftFront.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
+    /*motorLeftFront.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
     motorLeftRear.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
     motorRightFront.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
-    motorRightRear.setOpenLoopRampRate(DrivetrainConstants.kRampRate);
+    motorRightRear.setOpenLoopRampRate(DrivetrainConstants.kRampRate);*/
 
     //Limito a corrente dos motores por software para não desligar os fusiveis
     motorLeftFront.setSmartCurrentLimit(DrivetrainConstants.kMotorCurrentLimit);
@@ -109,6 +109,12 @@ public class Drivetrain extends SubsystemBase {
     motorLeftFront.set(left);
     motorRightRear.set(right);
     motorRightFront.set(right);
+  }
+  public double getLeftPower(){
+    return (motorLeftFront.get()+motorLeftRear.get())/2;
+  }
+  public double getRightPower(){
+    return (motorRightFront.get()+motorRightRear.get())/2;
   }
   //função de reset dos encoders definindo ponto inicial do robo
   public void resetEncoder(){

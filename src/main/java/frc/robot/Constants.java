@@ -34,7 +34,8 @@ public final class Constants {
     public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
     public static final double kGearboxRatio = 8.45;
     public static final double kWheelDistance = 6*Math.PI*0.0254;//converte 1 volta da roda em metros
-    public static final double kRampRate = 0.3;
+    public static final double kRampRate = 0.1;
+    public static final double kMaxSpeedArmExtended = 0.4;
 
   }
   public static class IntakeConstants{
@@ -56,7 +57,13 @@ public final class Constants {
     public static final int kReturnTicks = 7;
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
-    public static final double kPower = 0.7;
+    public static final double kPower = 0.5;
+    public static final double kZeroPosition = 0.7;
+    public static final int kHoldPosition = 0;
+    public static final int kLowPosition = 8;
+    public static final int kMediumPosition = 14;
+    public static final int kHighPosition = 26;
+    public static final int kIntakePosition = 20;    
   }
 
   public static class AuxiliarIntakeConstants{

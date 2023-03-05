@@ -10,11 +10,11 @@ import frc.robot.subsystems.Arm;
 
 public class SetArmPosition extends CommandBase {
   public enum Position{
-    Hold(0),
-    Low(8.0),
-    Medium(14.0),
-    High(26.0),
-    Intake(20.0);
+    Hold(ArmConstants.kHoldPosition),
+    Low(ArmConstants.kLowPosition),
+    Medium(ArmConstants.kMediumPosition),
+    High(ArmConstants.kHighPosition),
+    Intake(ArmConstants.kIntakePosition);
     double encoderValue;
     Position(double encoder){
       encoderValue = encoder;

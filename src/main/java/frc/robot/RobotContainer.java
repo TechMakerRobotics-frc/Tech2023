@@ -3,6 +3,7 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DriveCommand;
 import frc.robot.commands.SetArmPosition;
 import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
@@ -74,7 +75,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getLeftY(), m_driverController.getRightX()), drive));
+    drive.setDefaultCommand(new DriveCommand(m_driverController.getLeftY(),m_driverController.getRightX(), drive, arm));
     //Setando o braço pelos triggers do controle. 
     arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
     bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
