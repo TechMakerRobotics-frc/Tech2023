@@ -11,15 +11,43 @@ import frc.robot.subsystems.Drivetrain;
 
 public class DriveCommand extends CommandBase {
   /** Creates a new DriveCommand. */
-  private double right, left;
-  private Drivetrain drive;
-  private Arm arm;
   public DriveCommand(double forward, double turn, Drivetrain drive, Arm arm) {
-    addRequirements(drive);
-    left = forward - turn;
-    right = forward + turn;
-    this.drive = drive;
-    this.arm = arm;
+      addRequirements(drive);
+      double left = forward - turn;
+      double right = forward + turn;
+      double leftOutput = drive.getLeftPower();
+      double rightOutput = drive.getRightPower();
+      if(left>leftOutput){
+        leftOutput = leftOutput+DrivetrainConstants.kRampRate;
+        if(leftOutput>left)
+          leftOutput = left;
+        if(arm.getArmZero() && leftOutput>DrivetrainConstants.kMaxSpeedArmExtended)
+         leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      else if(left<leftOutput){
+        leftOutput = leftOutput-DrivetrainConstants.kRampRate;
+        if(leftOutput<left)
+          leftOutput = left;
+        if(arm.getArmZero() && leftOutput>DrivetrainConstants.kMaxSpeedArmExtended)
+         leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      if(right>rightOutput){
+        rightOutput = rightOutput+DrivetrainConstants.kRampRate;
+        if(rightOutput>right)
+        rightOutput = right;
+        if(arm.getArmZero() && rightOutput>DrivetrainConstants.kMaxSpeedArmExtended)
+        rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+      else if(right<rightOutput){
+        rightOutput = rightOutput-DrivetrainConstants.kRampRate;
+        if(rightOutput<right)
+        rightOutput = right;
+        if(arm.getArmZero() && rightOutput>DrivetrainConstants.kMaxSpeedArmExtended)
+        rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
+      }
+  
+      drive.setTankMotors(leftOutput, rightOutput);
+      
   }
 
   // Called when the command is initially scheduled.
@@ -29,38 +57,6 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double leftOutput = drive.getLeftPower();
-    double rightOutput = drive.getRightPower();
-    if(left>leftOutput){
-      leftOutput = leftOutput+DrivetrainConstants.kRampRate;
-      if(leftOutput>left)
-        leftOutput = left;
-      if(arm.getArmZero() && leftOutput>DrivetrainConstants.kMaxSpeedArmExtended)
-       leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
-    }
-    else if(left<leftOutput){
-      leftOutput = leftOutput-DrivetrainConstants.kRampRate;
-      if(leftOutput<left)
-        leftOutput = left;
-      if(arm.getArmZero() && leftOutput>DrivetrainConstants.kMaxSpeedArmExtended)
-       leftOutput = DrivetrainConstants.kMaxSpeedArmExtended;
-    }
-    if(right>rightOutput){
-      rightOutput = rightOutput+DrivetrainConstants.kRampRate;
-      if(rightOutput>right)
-      rightOutput = right;
-      if(arm.getArmZero() && rightOutput>DrivetrainConstants.kMaxSpeedArmExtended)
-      rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
-    }
-    else if(right<rightOutput){
-      rightOutput = rightOutput-DrivetrainConstants.kRampRate;
-      if(rightOutput<right)
-      rightOutput = right;
-      if(arm.getArmZero() && rightOutput>DrivetrainConstants.kMaxSpeedArmExtended)
-      rightOutput = DrivetrainConstants.kMaxSpeedArmExtended;
-    }
-
-    drive.setTankMotors(leftOutput, rightOutput);
 
 
   }
