@@ -11,7 +11,11 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -53,6 +57,7 @@ public class RobotContainer {
   Trigger bLevelLow = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelLow);
   Trigger bLevelHold = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelHold);
 
+  Trigger tLowBatt = new Trigger(pdp::getLowVoltage);
   //Configura os eventos do intake auxiliar
   Trigger bIntakeAuxDown = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxDown);
   Trigger bIntakeAuxUp = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxUp);
@@ -97,6 +102,9 @@ public class RobotContainer {
     bIntakeAuxDown.onTrue(new InstantCommand(()->intakeAux.setIntake(true),intakeAux));
     bIntakeAuxUp.onTrue(new InstantCommand(()->intakeAux.setIntake(false),intakeAux));
     m_driverController.back().onTrue(new InstantCommand(()->arm.resetEncoder(),arm));
+
+    tLowBatt.onTrue(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA BAIXA")));
+
   }
 
   

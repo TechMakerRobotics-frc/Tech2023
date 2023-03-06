@@ -2,6 +2,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 public final class Constants {
   /*
@@ -77,6 +78,11 @@ public final class Constants {
     public static final int kEncoderB = 1;
     public static final int kPulsesDown = 2048;
     public static final double kMotorPower = 0.7;
+  }
+  public static class PDPConstants{
+    public static final int kID = 1;
+    public static final ModuleType kModule= ModuleType.kCTRE;
+    public static final double kMinimumVoltage = 10.5;
   }
 
 }

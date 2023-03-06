@@ -206,5 +206,6 @@ public class Drivetrain extends SubsystemBase {
     SmartDashboard.putNumber("Distancia Esquerda", getLeftEncoder());
     SmartDashboard.putNumber("Distancia Direita", getRightEncoder());
     SmartDashboard.putNumber("Giro", getYaw());
+    SmartDashboard.putData(navX);
   }
 }
