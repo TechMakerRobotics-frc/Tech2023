@@ -1,10 +1,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
@@ -43,58 +40,25 @@ public final class Constants {
     public static final double ki = 0.0;
     public static final double kd = 0.01;
     public static final int kCountsPerRevolution = 42;
-    // -------- Physical Constants -----------------
-    public static final double kMetersPerDegree = Math.PI * kWheelDiameterMeters / 360;
-    public static final double kTrackwidthMeters = 0.43;
-    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(
-        kTrackwidthMeters);
-
-    // Calibration for the right wheel voltage because it's much slower
-    // than the left wheel on this robot.
-    // public static final double rightVoltsGain = 1.094; // Romi
-    public static final double rightVoltsGain = 1.0; // Romi-2
-
-    // -------- Dynamical constants --------------------
-
-    // Max speed and acceleration of the robot
-    public static final double kMaxSpeedMetersPerSecond = 0.5;
-    public static final double kMaxAccelMetersPerSecondSquared = 0.5;
-
-    // The linear inertia gain, volts
-    public static final double ksVolts = 0.461;
-    // The linear velocity gain, volts per (meter per second)
-    // Increase this if you drive short
-    public static final double kvVoltSecondsPerMeter = 6.93;
-    // public static final double kvVoltSecondsPerMeter = 9.7;
-    // The linear acceleration gain, volts per (meter per second squared).
-    public static final double kaVoltSecondsSquaredPerMeter = 0.0737;
-
-    // Setup constraints for feedforward and kinematics
-    public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(ksVolts,
-        kvVoltSecondsPerMeter,
-        kaVoltSecondsSquaredPerMeter);
-
-    // -------- Trajectory constants --------------------
-
-    // Voltage constraints
-    public static final DifferentialDriveVoltageConstraint kAutoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-        kFeedForward,
-        kDriveKinematics,
-        10);
-
-    // Setup trajectory constraints
-    public static final TrajectoryConfig kTrajectoryConfig = new TrajectoryConfig(kMaxSpeedMetersPerSecond,
-        kMaxAccelMetersPerSecondSquared)
-        .setKinematics(kDriveKinematics)
-        .addConstraint(kAutoVoltageConstraint);
-
-    // -------- PID constants --------------------
-    public static final double kPDriveVel = 0.125;
-    public static final double kIDriveVel = 0;
-    public static final double kDDriveVel = 0;
-
-    public static final double kPDriveVelLeft = 0.125;
-    public static final double kPDriveVelRight = 0.125;
+    public static final double kTrackwidth = 0.445;
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidth);
+    
+    public static final int kEncoderCPR = 8192;
+    public static final double kWheelDiameterInches = 6;
+    public static final double kEncoderDistancePerPulse = 0.48/2048.;
+    
+    public static final double ks = 1.06;
+    public static final double kv = 2.49;
+    public static final double ka = 0.0375;
+    
+    public static final double kPDriveVel = 0.1;
+    public static final double kIDriveVel = 0.0;
+    public static final double kDDriveVel = 0.0;
+    
+    public static final double kMaxSpeed = 0.5;
+    public static final double kMaxAcceleration = 1;
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
   }
 
   public static class IntakeConstants {
