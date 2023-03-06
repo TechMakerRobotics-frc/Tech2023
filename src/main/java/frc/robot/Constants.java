@@ -43,9 +43,9 @@ public final class Constants {
     public static final double kTrackwidth = 0.445;
     public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidth);
     
-    public static final int kEncoderCPR = 8192;
+    public static final int kEncoderCPR = 42;
     public static final double kWheelDiameterInches = 6;
-    public static final double kEncoderDistancePerPulse = 0.48/2048.;
+    public static final double kEncoderDistancePerPulse = (kWheelDiameterMeters*Math.PI)/kEncoderCPR;
     
     public static final double ks = 1.06;
     public static final double kv = 2.49;
@@ -95,8 +95,8 @@ public final class Constants {
 
   public static class AuxiliarIntakeConstants {
     public static final int kIntakeMotor = 2;
-    public static final int kEncoderA = 0;
-    public static final int kEncoderB = 1;
+    public static final int kEncoderA = 1;
+    public static final int kEncoderB = 3;
     public static final int kPulsesDown = 2048;
     public static final double kMotorPower = 0.7;
   }
