@@ -77,9 +77,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getLeftY(), m_driverController.getRightX(),!arm.getArmZero()), drive));
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getLeftY(), m_driverController.getRightX()), drive));
     //Setando o braço pelos triggers do controle. 
-    intakeAux.setDefaultCommand(new RunCommand(()->intakeAux.setMotor((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), intakeAux));
+    arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
     bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
     bLevelMedium.onTrue(new SetArmPosition(arm,Position.Medium));
     bLevelLow.onTrue(new SetArmPosition(arm,Position.Low));
