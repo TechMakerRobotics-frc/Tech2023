@@ -39,13 +39,8 @@ public class AuxiliarIntake extends SubsystemBase {
   public void setMotor(double power){
     motor.set(ControlMode.PercentOutput,power);
   }
-  public void setIntake(boolean forward){
-    if(getEncoder()<100 && forward){
-      motor.set(ControlMode.PercentOutput,AuxiliarIntakeConstants.kMotorPower);
-    }
-    else if(getEncoder()>200 && !forward){
-      motor.set(ControlMode.PercentOutput,AuxiliarIntakeConstants.kMotorPower*-1);
-    }
+  public void setIntake(double forward){
+      motor.set(ControlMode.PercentOutput,forward);
   }
   @Override
   public void periodic() {

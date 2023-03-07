@@ -9,7 +9,6 @@ import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,8 +17,10 @@ import frc.robot.Constants.DrivetrainConstants;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 public class Drivetrain extends SubsystemBase {
   // Motores de tração
@@ -33,8 +34,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Encoders. São utilizados os enconders internos dos motores
   // Para maior precisão é usada a media dos dois motores
-  private Encoder leftEncoder1, leftEncoder2;
-  private Encoder rightEncoder1, rightEncoder2;
+  private RelativeEncoder leftEncoder1, leftEncoder2;
+  private RelativeEncoder rightEncoder1, rightEncoder2;
 
   // Placa de navegação
   private AHRS m_gyro;
@@ -60,20 +61,20 @@ public class Drivetrain extends SubsystemBase {
     motorRightFront.setIdleMode(IdleMode.kCoast);
     motorRightRear.setIdleMode(IdleMode.kCoast);
     // Inverto o sentido da esquerda para rodarem iguais
-    motorLeftFront.setInverted(true);
-    motorLeftRear.setInverted(true);
-
+    //motorLeftFront.setInverted(true);
+    //motorLeftRear.setInverted(true);
+    setMaxOutput(false);
     // Busco o objeto encoder de cada modulo e associo
-    leftEncoder1 = ((Encoder) motorLeftRear.getEncoder());
-    rightEncoder1 = ((Encoder) motorRightRear.getEncoder());
-    leftEncoder2 = ((Encoder) motorLeftFront.getEncoder());
-    rightEncoder2 = ((Encoder) motorRightFront.getEncoder());
-
+    leftEncoder1 = motorLeftRear.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
+    rightEncoder1 = motorRightRear.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
+    leftEncoder2 = motorLeftFront.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
+    rightEncoder2 = motorRightFront.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
+    
     // Configuro o fator do encoder para 1 - 1 pulso por volta.
-    leftEncoder1.setDistancePerPulse(DrivetrainConstants.kEncoderDistancePerPulse);
-    rightEncoder1.setDistancePerPulse(DrivetrainConstants.kEncoderDistancePerPulse);
-    leftEncoder2.setDistancePerPulse(DrivetrainConstants.kEncoderDistancePerPulse);
-    rightEncoder2.setDistancePerPulse(DrivetrainConstants.kEncoderDistancePerPulse);
+    leftEncoder1.setPositionConversionFactor(1);
+    rightEncoder1.setPositionConversionFactor(1);
+    leftEncoder2.setPositionConversionFactor(1);
+    rightEncoder2.setPositionConversionFactor(1);
 
     // Seto a posição para no começo
     resetEncoders();
@@ -99,10 +100,15 @@ public class Drivetrain extends SubsystemBase {
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Distancia Esquerda", getLeftEncoder());
-    SmartDashboard.putNumber("Distancia Direita", getRightEncoder());
+    SmartDashboard.putNumber("Distancia Esquerda", getLeftDistanceMeters());
+    SmartDashboard.putNumber("Distancia Direita", getRightDistanceMeters());
     SmartDashboard.putNumber("Giro", getYaw());
     SmartDashboard.putData("Acelerometro", m_accelerometer);
+    SmartDashboard.putNumber("Motor esquerdo1", motorLeftFront.get());
+    SmartDashboard.putNumber("Motor esquerdo2", motorLeftRear.get());
+    SmartDashboard.putNumber("Motor direito1", motorRightFront.get());
+    SmartDashboard.putNumber("Motor direito2", motorRightRear.get());
+    
     // Update the odometry in the periodic block
     m_odometry.update(m_gyro.getRotation2d(),
         getLeftDistanceMeters(),
@@ -128,7 +134,7 @@ public class Drivetrain extends SubsystemBase {
      */
     double left = forward - turn;
     double right = forward + turn;
-    tankDriveVolts(left, right);
+    tankDrive(left, right);
 
   }
 
@@ -140,19 +146,38 @@ public class Drivetrain extends SubsystemBase {
     if(set)
       m_diffDrive.setMaxOutput(DrivetrainConstants.kMaxSpeedArmExtended);
     else
-    m_diffDrive.setMaxOutput(1.0);
+      m_diffDrive.setMaxOutput(1.0);
   }
-
+  public void breake(boolean set){
+    if(set){
+      motorLeftFront.setIdleMode(IdleMode.kBrake);
+    motorLeftRear.setIdleMode(IdleMode.kBrake);
+    motorRightFront.setIdleMode(IdleMode.kBrake);
+    motorRightRear.setIdleMode(IdleMode.kBrake);
+    }
+    else{
+      motorLeftFront.setIdleMode(IdleMode.kCoast);
+    motorLeftRear.setIdleMode(IdleMode.kCoast);
+    motorRightFront.setIdleMode(IdleMode.kCoast);
+    motorRightRear.setIdleMode(IdleMode.kCoast);
+    }
+  }
   public void arcadeDrive(double forward, double rotation) {
     m_diffDrive.arcadeDrive(forward, rotation);
+
   }
 
   public void tankDriveVolts(double left, double right) {
     m_leftMotor.setVoltage(left);
-    m_rightMotor.setVoltage(-right);
+    m_rightMotor.setVoltage(right);
     m_diffDrive.feed();
   }
-
+  public void tankDrive(double left, double right) {
+    m_leftMotor.set(left);
+    m_rightMotor.set(right);
+    m_diffDrive.feed();
+    
+  }
   public void stopDrivetrain() {
     tankDriveVolts(0, 0);
   }
@@ -177,26 +202,26 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getRightDistanceMeters() {
-    return ((rightEncoder1.getDistance() + rightEncoder2.getDistance()) / 2.0);
+    return getRightEncoder()*DrivetrainConstants.kEncoderDistancePerPulse;
   }
 
   public double getLeftDistanceMeters() {
-    return ((leftEncoder1.getDistance() + leftEncoder2.getDistance()) / 2.0);
+    return getLeftEncoder()*DrivetrainConstants.kEncoderDistancePerPulse;
   }
 
   public double getRightEncoder() {
-    return (rightEncoder1.get() + rightEncoder2.get()) / 2.0;
+    return (rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2.0;
   }
 
   public double getLeftEncoder() {
-    return (leftEncoder1.get() + leftEncoder2.get()) / 2.0;
+    return (leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2.0;
   }
  // função de reset dos encoders definindo ponto inicial do robo
  public void resetEncoders() {
-  leftEncoder1.reset();
-  leftEncoder2.reset();
-  rightEncoder1.reset();
-  rightEncoder2.reset();
+  leftEncoder1.setPosition(0);
+  leftEncoder2.setPosition(0);
+  rightEncoder1.setPosition(0);
+  rightEncoder2.setPosition(0);
 }
   /**
    * Funções de telemetria

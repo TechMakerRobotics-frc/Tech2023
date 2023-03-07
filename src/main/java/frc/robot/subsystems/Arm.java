@@ -31,8 +31,7 @@ public class Arm extends SubsystemBase {
     motorLeft.setIdleMode(IdleMode.kBrake);
     motorRight.setIdleMode(IdleMode.kBrake);
     //Configuro a rampa de aceleração para evitar picos de corrente
-    motorLeft.setOpenLoopRampRate(ArmConstants.kRampRate);
-    motorRight.setOpenLoopRampRate(ArmConstants.kRampRate);
+    
 
     //Inverto o motor da esquerda para que girem juntos
     motorLeft.setInverted(true);
@@ -72,9 +71,7 @@ public class Arm extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Braco Encoder", getEncoder());
-    if(getEncoder()>ArmConstants.kMaxForwardTicks || getEncoder()<1){
-      setMotorPower(0);
-    }
+   
   }
 
 

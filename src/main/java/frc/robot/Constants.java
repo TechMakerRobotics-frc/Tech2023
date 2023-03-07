@@ -68,8 +68,8 @@ public final class Constants {
     public static final double kIntakeCubeRevert = kIntakeCone;
     public static final double kIntakeConeRevert = kIntakeCube;
     public static final int kIntakeStop = 0;
-    public static final double kIntakeTimeCone = 0.5;
-    public static final double kIntakeTimeCube = 0.5;
+    public static final double kIntakeTimeCone = 0.75;
+    public static final double kIntakeTimeCube = 0.75;
     public static final double kRampRate = 0.05;
 
   }
@@ -81,7 +81,7 @@ public final class Constants {
     public static final int kReturnTicks = 7;
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
-    public static final double kPower = 0.3;
+    public static final double kPower = 0.06;
     public static final double kZeroPosition = 100;
     public static final int kHoldPosition = 0;
     public static final int kLowPosition = 360;
@@ -98,7 +98,7 @@ public final class Constants {
     public static final int kEncoderA = 1;
     public static final int kEncoderB = 3;
     public static final int kPulsesDown = 2048;
-    public static final double kMotorPower = 0.7;
+    public static final double kMotorPower = 1;
   }
 
   public static class PDPConstants {

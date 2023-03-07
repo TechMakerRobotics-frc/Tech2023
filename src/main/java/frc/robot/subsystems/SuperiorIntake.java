@@ -58,7 +58,7 @@ public class SuperiorIntake extends SubsystemBase {
    */
   public void intakeElement(Element element){
     double timeout = 0;
-    if(lastElement==Element.None){
+    if(lastElement==Element.None || lastElement==element){
       if(element==Element.Cube)
         timeout = IntakeConstants.kIntakeTimeCube;
       if(element==Element.Cone)
