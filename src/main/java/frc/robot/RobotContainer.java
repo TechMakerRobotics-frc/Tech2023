@@ -5,8 +5,6 @@ package frc.robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.SetArmPosition;
-import frc.robot.commands.SetArmPosition.Position;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -82,37 +80,31 @@ public class RobotContainer {
     drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getLeftTriggerAxis())+(m_driverController.getRightTriggerAxis()*-1), 
                               m_driverController.getRightX()*0.5), drive));
     //Setando o braço pelos triggers do controle. 
-    //arm.setDefaultCommand(new RunCommand(()->arm.setMotorPower((m_driverController.getLeftTriggerAxis()*-0.5)+(m_driverController.getRightTriggerAxis()*0.5)), arm));
-    /*bLevelHigh.onTrue(new SetArmPosition(arm,Position.High));
-    bLevelMedium.onTrue(new SetArmPosition(arm,Position.Medium));
-    bLevelLow.onTrue(new SetArmPosition(arm,Position.Low));
-    bLevelHold.onTrue(new SetArmPosition(arm,Position.Hold));
-    bIntakeArm.onTrue(new SetArmPosition(arm,Position.Intake));*/
+    
 
     bLevelHigh.onTrue(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPower),arm))
               .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
     bLevelMedium.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm))
               .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
+
     //Seta elementos de intake com comandos do controles de  navegação
 
-bIntakeArm.onTrue(new InstantCommand(()->drive.breake(true),drive))
+    bIntakeArm.onTrue(new InstantCommand(()->drive.breake(true),drive))
           .onFalse(new InstantCommand(()->drive.breake(false),drive));
-
-    m_driverController.a().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
-    m_driverController.b().onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
-    m_driverController.x().onTrue(new InstantCommand(()->intake.releaseElement(),intake));
     
-    bIntakeCone.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake));
-    bIntakeCube.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake));
+    bIntakeCone.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake))
+                .onFalse(new InstantCommand(()->intake.stopIntake(),intake));
+    bIntakeCube.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cube),intake))
+                .onFalse(new InstantCommand(()->intake.stopIntake(),intake));
     bIntakeRelease.onTrue(new InstantCommand(()->intake.releaseElement(),intake));
     
     bIntakeAuxDown.onTrue(new InstantCommand(()->intakeAux.setIntake(AuxiliarIntakeConstants.kMotorPower),intakeAux))
                   .onFalse(new InstantCommand(()->intakeAux.setIntake(0),intakeAux));
     bIntakeAuxUp.onTrue(new InstantCommand(()->intakeAux.setIntake(-AuxiliarIntakeConstants.kMotorPower),intakeAux))
-    .onFalse(new InstantCommand(()->intakeAux.setIntake(0),intakeAux));
-    m_driverController.back().onTrue(new InstantCommand(()->arm.resetEncoder(),arm));
+                .onFalse(new InstantCommand(()->intakeAux.setIntake(0),intakeAux));
 
-    tLowBatt.onTrue(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA BAIXA")));
+    tLowBatt.onTrue(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA BAIXA")))
+            .onFalse(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA OK")));
 
   }
 

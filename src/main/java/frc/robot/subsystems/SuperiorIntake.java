@@ -57,18 +57,18 @@ public class SuperiorIntake extends SubsystemBase {
    * Ainda, ajusta o  timer, para que o  motor só gire pouco tempo, o  suficiente para manter  o  elemento
    */
   public void intakeElement(Element element){
-    double timeout = 0;
     if(lastElement==Element.None || lastElement==element){
       if(element==Element.Cube)
-        timeout = IntakeConstants.kIntakeTimeCube;
+        motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
       if(element==Element.Cone)
-        timeout = IntakeConstants.kIntakeTimeCone;
+      motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
       
       lastElement = element;
-
-      time = Timer.getFPGATimestamp()+timeout;
-      motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
+      
     }
+  }
+  public void stopIntake(){
+    motor.set(VictorSPXControlMode.PercentOutput, 0);
   }
   //Aqui libera  o elemento, com o sentido contrario a captura. E já coloca o  estado como nenhum
   public void releaseElement(){
@@ -82,7 +82,7 @@ public class SuperiorIntake extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putString("Elemento atual", lastElement.getName());
-    if(Timer.getFPGATimestamp()>time)
+    if(Timer.getFPGATimestamp()>time && lastElement==Element.None)
       motor.set(VictorSPXControlMode.PercentOutput, 0);
 
   }
