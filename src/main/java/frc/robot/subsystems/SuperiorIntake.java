@@ -8,6 +8,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +18,9 @@ import frc.robot.Constants.IntakeConstants;
 public class SuperiorIntake extends SubsystemBase {
   //Classe do motor do intake superior do  robo
   VictorSPX motor = new VictorSPX(IntakeConstants.kIntakeMotor);
+  PWM blue = new PWM(IntakeConstants.kPWMChannelBlue);
+  PWM red = new PWM(IntakeConstants.kPWMChannelRed);
+  PWM green = new PWM(IntakeConstants.kPWMChannelGreen);
   //Cria uma lista de elementos possiveis. Assim associamos diversas caracteristicas
   // dos elementos para ser usado internamente  na classe
   public enum Element{
@@ -56,6 +61,22 @@ public class SuperiorIntake extends SubsystemBase {
    * para capturar o elemento correto
    * Ainda, ajusta o  timer, para que o  motor só gire pouco tempo, o  suficiente para manter  o  elemento
    */
+  public void setLedTeamColor(){
+    DriverStation.Alliance color;
+	  color = DriverStation.getAlliance();
+	  if(color == DriverStation.Alliance.Blue){
+        blue.setRaw(200);
+        red.setRaw(0);
+        green.setRaw(0);
+	  }else {
+      blue.setRaw(0);
+      red.setRaw(200);
+      green.setRaw(0);
+	  }
+
+
+
+  }
   public void intakeElement(Element element){
     if(lastElement==Element.None || lastElement==element){
       if(element==Element.Cube)

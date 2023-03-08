@@ -71,6 +71,9 @@ public final class Constants {
     public static final double kIntakeTimeCone = 0.75;
     public static final double kIntakeTimeCube = 0.75;
     public static final double kRampRate = 0.05;
+    public static final int kPWMChannelRed = 0;
+    public static final int kPWMChannelGreen = 1;
+    public static final int kPWMChannelBlue = 2;
 
   }
 
@@ -95,9 +98,6 @@ public final class Constants {
 
   public static class AuxiliarIntakeConstants {
     public static final int kIntakeMotor = 2;
-    public static final int kEncoderA = 1;
-    public static final int kEncoderB = 3;
-    public static final int kPulsesDown = 2048;
     public static final double kMotorPower = 1;
   }
 
