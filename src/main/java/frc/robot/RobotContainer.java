@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
@@ -31,35 +32,35 @@ public class RobotContainer {
   private final SuperiorIntake intake;
   private final PDP pdp = new PDP();
   private final AuxiliarIntake intakeAux = new AuxiliarIntake();
-
+  private final Limelight limeLight = new Limelight();
   /**
   * Cria os controles para comandar
   * Usamos um controle de Xbox ou manche para navegação
   * E uma central de botões  para os mecanismos
   **/
 
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
+  //private final CommandXboxController m_driverController =      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private final Joystick m_driverController = new Joystick(OperatorConstants.kDriverControllerPort);
   private final Joystick m_operatorControlller = new Joystick(OperatorConstants.kOperatorControllerPort);
   //Cconfigura os eventos para o intake
   Trigger bIntakeCone = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeCone);
   Trigger bIntakeCube = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeCube);
   Trigger bIntakeRelease = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeRelease);
-  Trigger bIntakeArm = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmIntake);
   
   //Configura os eventos de  posições do braço
-  Trigger bLevelHigh = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelHigh);
-  Trigger bLevelMedium = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelMedium);
-  Trigger bLevelLow = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelLow);
-  Trigger bLevelHold = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLevelHold);
+  Trigger bLevelHigh = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmHigh);
+  Trigger bLevelLow = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmLow);
+  Trigger bLevelKeepHigh = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmKeepHigh);
+  Trigger bLevelKeepLow = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonArmKeepLow);
 
   Trigger tLowBatt = new Trigger(pdp::getLowVoltage);
   //Configura os eventos do intake auxiliar
   Trigger bIntakeAuxDown = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxDown);
   Trigger bIntakeAuxUp = new JoystickButton(m_operatorControlller,OperatorConstants.kButtonIntakeAuxUp);
+  Trigger bBreake = new JoystickButton(m_operatorControlller, OperatorConstants.kButtonBreake);
 
-
+  Trigger bLightOn = new JoystickButton(m_driverController,2);
+  Trigger bLightOff = new JoystickButton(m_driverController,1);
 
   /** 
    * Dentro do container é que são guardados organizados os elementos do robo.
@@ -77,19 +78,27 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getLeftTriggerAxis())+(m_driverController.getRightTriggerAxis()*-1), 
-                              m_driverController.getRightX()*0.5), drive));
+    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getLeftTriggerAxis())+(m_driverController.getRightTriggerAxis()*-1), 
+    //                          m_driverController.getRightX()*0.5), drive));
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
+    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
+
+
+    bLightOff.onTrue(new InstantCommand(()->limeLight.ledOn() ,limeLight));
+    bLightOn.onTrue(new InstantCommand(()->limeLight.ledOff() ,limeLight));
+
     //Setando o braço pelos triggers do controle. 
     
 
     bLevelHigh.onTrue(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPower),arm))
               .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
-    bLevelMedium.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm))
+    bLevelLow.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm))
               .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
-
+    bLevelKeepHigh.onTrue(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPowerWait),arm));
+    bLevelKeepLow.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm));
     //Seta elementos de intake com comandos do controles de  navegação
 
-    bIntakeArm.onTrue(new InstantCommand(()->drive.breake(true),drive))
+    bBreake.onTrue(new InstantCommand(()->drive.breake(true),drive))
           .onFalse(new InstantCommand(()->drive.breake(false),drive));
     
     bIntakeCone.onTrue(new InstantCommand(()->intake.intakeElement(Element.Cone),intake))
@@ -106,6 +115,7 @@ public class RobotContainer {
     tLowBatt.onTrue(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA BAIXA")))
             .onFalse(new InstantCommand(()->SmartDashboard.putString("ALERTA BATERIA", "BATERIA OK")));
 
+    
   }
 
   

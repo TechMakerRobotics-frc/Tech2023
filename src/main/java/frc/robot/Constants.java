@@ -15,13 +15,13 @@ public final class Constants {
     public static final int kButtonIntakeCube = 9; /* cubo */
     public static final int kButtonIntakeCone = 10; /* cone */
     public static final int kButtonIntakeRelease = 11; /* soltar */
-    public static final int kButtonArmIntake = 12; // Braço na posição de intake
-    public static final int kButtonArmLevelHigh = 5;/* estaaçao nivel alta */
-    public static final int kButtonArmLevelMedium = 6;/* estaçao nivel media */
-    public static final int kButtonArmLevelLow = 7;/* estacao nivel baixa */
-    public static final int kButtonArmLevelHold = 8; // Braço recolhido
+    public static final int kButtonArmHigh = 5;/* estaaçao nivel alta */
+    public static final int kButtonArmLow = 6;/* estaçao nivel media */
+    public static final int kButtonArmKeepHigh = 1;/* estacao nivel baixa */
+    public static final int kButtonArmKeepLow = 2; // Braço recolhido
     public static final int kButtonIntakeAuxDown = 3; // Baixa intake Auxiliar
     public static final int kButtonIntakeAuxUp = 4; // Sobe intake auxiliar
+    public static final int kButtonBreake = 12;
 
   }
 
@@ -84,13 +84,8 @@ public final class Constants {
     public static final int kReturnTicks = 7;
     public static final int kMaxForwardTicks = 27;
     public static final double kRampRate = 0.3;
-    public static final double kPower = 0.06;
-    public static final double kZeroPosition = 100;
-    public static final int kHoldPosition = 0;
-    public static final int kLowPosition = 360;
-    public static final int kMediumPosition = 880;
-    public static final int kHighPosition = 1600;
-    public static final int kIntakePosition = 1300;
+    public static final double kPower = 0.2;
+    public static final double kPowerWait = 0.06;
     public static final double kp = 0.1;
     public static final double ki = 0.0;
     public static final double kd = 0.01;

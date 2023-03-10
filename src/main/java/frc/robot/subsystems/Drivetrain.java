@@ -65,10 +65,10 @@ public class Drivetrain extends SubsystemBase {
     //motorLeftRear.setInverted(true);
     setMaxOutput(false);
     // Busco o objeto encoder de cada modulo e associo
-    leftEncoder1 = motorLeftRear.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
-    rightEncoder1 = motorRightRear.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
-    leftEncoder2 = motorLeftFront.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
-    rightEncoder2 = motorRightFront.getEncoder(Type.kQuadrature,DrivetrainConstants.kCountsPerRevolution);
+    leftEncoder1 = motorLeftRear.getEncoder();
+    rightEncoder1 = motorRightRear.getEncoder();
+    leftEncoder2 = motorLeftFront.getEncoder();
+    rightEncoder2 = motorRightFront.getEncoder();
     
     // Configuro o fator do encoder para 1 - 1 pulso por volta.
     leftEncoder1.setPositionConversionFactor(1);
@@ -151,15 +151,15 @@ public class Drivetrain extends SubsystemBase {
   public void breake(boolean set){
     if(set){
       motorLeftFront.setIdleMode(IdleMode.kBrake);
-    motorLeftRear.setIdleMode(IdleMode.kBrake);
-    motorRightFront.setIdleMode(IdleMode.kBrake);
-    motorRightRear.setIdleMode(IdleMode.kBrake);
+      motorLeftRear.setIdleMode(IdleMode.kBrake);
+      motorRightFront.setIdleMode(IdleMode.kBrake);
+      motorRightRear.setIdleMode(IdleMode.kBrake);
     }
     else{
       motorLeftFront.setIdleMode(IdleMode.kCoast);
-    motorLeftRear.setIdleMode(IdleMode.kCoast);
-    motorRightFront.setIdleMode(IdleMode.kCoast);
-    motorRightRear.setIdleMode(IdleMode.kCoast);
+      motorLeftRear.setIdleMode(IdleMode.kCoast);
+      motorRightFront.setIdleMode(IdleMode.kCoast);
+      motorRightRear.setIdleMode(IdleMode.kCoast);
     }
   }
   public void arcadeDrive(double forward, double rotation) {
@@ -173,7 +173,7 @@ public class Drivetrain extends SubsystemBase {
     m_diffDrive.feed();
   }
   public void tankDrive(double left, double right) {
-    m_leftMotor.set(left);
+    m_leftMotor.set(-left);
     m_rightMotor.set(right);
     m_diffDrive.feed();
     

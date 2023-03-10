@@ -65,9 +65,7 @@ public class Arm extends SubsystemBase {
   public double getEncoder(){
     return (((rightEncoder.getPosition()+leftEncoder.getPosition())/2)*ArmConstants.kGearRatio);
   }
-  public boolean getArmZero(){
-    return (getEncoder()<ArmConstants.kZeroPosition);
-  }
+  
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Braco Encoder", getEncoder());
