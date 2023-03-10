@@ -1,7 +1,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
@@ -40,12 +39,11 @@ public final class Constants {
     public static final double ki = 0.0;
     public static final double kd = 0.01;
     public static final int kCountsPerRevolution = 42;
-    public static final double kTrackwidth = 0.445;
-    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidth);
+    public static final double kTrackwidth = 28;
     
     public static final int kEncoderCPR = 42;
     public static final double kWheelDiameterInches = 6;
-    public static final double kEncoderDistancePerPulse = (kWheelDiameterMeters*Math.PI)/kEncoderCPR;
+    public static final double kEncoderDistancePerRotation = (kWheelDiameterMeters*Math.PI)/(kGearboxRatio);
     
     public static final double ks = 1.06;
     public static final double kv = 2.49;
@@ -100,6 +98,19 @@ public final class Constants {
     public static final int kID = 1;
     public static final ModuleType kModule = ModuleType.kCTRE;
     public static final double kMinimumVoltage = 10.5;
+  }
+
+  public static class autonomousConstants{
+    public static final double kDistanceToPark = 2.3;
+    public static final double kDriveSpeed = 0.6;
+    public static final double kDriveSpeedSlow = 0.3;
+    public static final double kMaxAngle= 2;
+    public static final double kMaxDistance = 0.3;
+    public static final double kP = 0.02;
+    public static final double kI = 0.05;
+    public static final double kD = 0.01;
+    public static final double kLimit = 2;
+
   }
 
 }

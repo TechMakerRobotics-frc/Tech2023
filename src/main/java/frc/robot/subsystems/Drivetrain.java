@@ -7,10 +7,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DrivetrainConstants;
@@ -40,10 +42,11 @@ public class Drivetrain extends SubsystemBase {
 
   // Placa de navegação
   private AHRS m_gyro;
-  // Set up the BuiltInAccelerometer
-  private final BuiltInAccelerometer m_accelerometer = new BuiltInAccelerometer();
+  
 
   // Odometry class for tracking robot pose
+  private DifferentialDriveKinematics kinematics;
+  private Field2d field = new Field2d();
 
   private final DifferentialDriveOdometry m_odometry;
 
@@ -62,8 +65,8 @@ public class Drivetrain extends SubsystemBase {
     motorRightFront.setIdleMode(IdleMode.kCoast);
     motorRightRear.setIdleMode(IdleMode.kCoast);
     // Inverto o sentido da esquerda para rodarem iguais
-    //motorLeftFront.setInverted(true);
-    //motorLeftRear.setInverted(true);
+    motorRightFront.setInverted(true);
+    motorRightRear.setInverted(true);
     setMaxOutput(false);
     // Busco o objeto encoder de cada modulo e associo
     leftEncoder1 = motorLeftRear.getEncoder();
@@ -72,10 +75,14 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder2 = motorRightFront.getEncoder();
     
     // Configuro o fator do encoder para 1 - 1 pulso por volta.
-    leftEncoder1.setPositionConversionFactor(1);
-    rightEncoder1.setPositionConversionFactor(1);
-    leftEncoder2.setPositionConversionFactor(1);
-    rightEncoder2.setPositionConversionFactor(1);
+     leftEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
+    leftEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
+    rightEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
+    rightEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
+    motorLeftFront.burnFlash();
+    motorLeftRear.burnFlash();
+    motorRightFront.burnFlash();
+    motorRightRear.burnFlash();
 
     // Seto a posição para no começo
     resetEncoders();
@@ -84,12 +91,13 @@ public class Drivetrain extends SubsystemBase {
     m_gyro = new AHRS(DrivetrainConstants.NAVX_PORT);
     resetYaw();
     Pose2d initialPose = new Pose2d(0, 1.5, m_gyro.getRotation2d());
-
+    kinematics =
+            new DifferentialDriveKinematics(Units.inchesToMeters(DrivetrainConstants.kTrackwidth));
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
         getLeftDistanceMeters(), getRightDistanceMeters(),
         initialPose);
 
-    m_poseEstimator = new DifferentialDrivePoseEstimator(DrivetrainConstants.kDriveKinematics,
+    m_poseEstimator = new DifferentialDrivePoseEstimator(kinematics,
         m_gyro.getRotation2d(),
         getLeftDistanceMeters(), getRightDistanceMeters(),
         initialPose,
@@ -103,27 +111,30 @@ public class Drivetrain extends SubsystemBase {
     }
     return instance;
 }
+public void updatePose() {
+  m_odometry.update(m_gyro.getRotation2d(), Units.inchesToMeters(leftEncoder1.getPosition()), Units.inchesToMeters(rightEncoder1.getPosition()));
+  field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+}
+
+public void resetPose(Pose2d newPose) {
+  m_poseEstimator.resetPosition(m_gyro.getRotation2d(), leftEncoder1.getPosition(), rightEncoder1.getPosition(), newPose);
+}
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Distancia Esquerda", getLeftDistanceMeters());
     SmartDashboard.putNumber("Distancia Direita", getRightDistanceMeters());
+    SmartDashboard.putNumber("Distancia Total", GetAverageEncoderDistance());
     SmartDashboard.putNumber("Giro", getYaw());
-    SmartDashboard.putData("Acelerometro", m_accelerometer);
-    SmartDashboard.putNumber("Motor esquerdo1", motorLeftFront.get());
-    SmartDashboard.putNumber("Motor esquerdo2", motorLeftRear.get());
-    SmartDashboard.putNumber("Motor direito1", motorRightFront.get());
-    SmartDashboard.putNumber("Motor direito2", motorRightRear.get());
-    
-    // Update the odometry in the periodic block
-    m_odometry.update(m_gyro.getRotation2d(),
-        getLeftDistanceMeters(),
-        getRightDistanceMeters());
+    SmartDashboard.putNumber("Roll", getRoll());
+    SmartDashboard.putNumber("Angle", getPitch());   
+    SmartDashboard.putData("Field",field);
 
     m_poseEstimator.update(m_gyro.getRotation2d(),
         getLeftDistanceMeters(),
         getRightDistanceMeters());
-
+    updatePose();
   }
 
   /*
@@ -179,7 +190,7 @@ public class Drivetrain extends SubsystemBase {
     m_diffDrive.feed();
   }
   public void tankDrive(double left, double right) {
-    m_leftMotor.set(-left);
+    m_leftMotor.set(left);
     m_rightMotor.set(right);
     m_diffDrive.feed();
     
@@ -208,15 +219,15 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getRightDistanceMeters() {
-    return getRightEncoder()*DrivetrainConstants.kEncoderDistancePerPulse;
+    return getRightEncoder();
   }
 
   public double getLeftDistanceMeters() {
-    return getLeftEncoder()*DrivetrainConstants.kEncoderDistancePerPulse;
+    return getLeftEncoder();
   }
 
   public double getRightEncoder() {
-    return (rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2.0;
+    return ((rightEncoder1.getPosition() + rightEncoder2.getPosition()) / 2.0);
   }
 
   public double getLeftEncoder() {
@@ -246,6 +257,13 @@ public class Drivetrain extends SubsystemBase {
     m_gyro.reset();
   }
 
+  public double getRoll(){
+    return m_gyro.getRoll();
+  }
+
+  public double getPitch(){
+    return m_gyro.getPitch();
+  }
    /**
    * Zeroes the heading of the robot
    */

@@ -5,6 +5,12 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
+
+import java.io.Console;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class DriveDistance extends CommandBase {
@@ -20,11 +26,11 @@ public class DriveDistance extends CommandBase {
    * @param meters The number of meters the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-  public DriveDistance(double speed, double meters, Drivetrain drive) {
+  public DriveDistance(double speed, double meters) {
+    m_drive = Drivetrain.getInstance();
     m_distance = meters;
     m_speed = speed;
-    m_drive = drive;
-    addRequirements(drive);
+    
   }
 
   // Called when the command is initially scheduled.
@@ -32,6 +38,7 @@ public class DriveDistance extends CommandBase {
   public void initialize() {
     m_drive.arcadeDrive(0, 0);
     m_drive.resetEncoders();
+    SmartDashboard.putNumber(getName(), m_distance);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,6 +50,7 @@ public class DriveDistance extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    SmartDashboard.putString(getName(), "Ended");
     m_drive.arcadeDrive(0, 0);
   }
 

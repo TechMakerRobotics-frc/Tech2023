@@ -5,6 +5,8 @@ package frc.robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.DriveAndTurn;
+import frc.robot.commands.DriveBalance;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -12,7 +14,11 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,12 +38,15 @@ public class RobotContainer {
   private final PDP pdp = PDP.getInstance();
   private final AuxiliarIntake intakeAux = AuxiliarIntake.getInstance();
   private final Limelight limeLight = Limelight.getInstance();
+  public static final ShuffleboardTab mainTab = Shuffleboard.getTab("Robot");
+
   /**
   * Cria os controles para comandar
   * Usamos um controle de Xbox ou manche para navegação
   * E uma central de botões  para os mecanismos
   **/
-
+  private final XboxController m_driver = new XboxController(OperatorConstants.kDriverControllerPort);
+  
   private final Joystick m_driverController = new Joystick(OperatorConstants.kDriverControllerPort);
   private final Joystick m_operatorControlller = new Joystick(OperatorConstants.kOperatorControllerPort);
   //Cconfigura os eventos para o intake
@@ -59,6 +68,7 @@ public class RobotContainer {
 
   Trigger bLightOn = new JoystickButton(m_driverController,2);
   Trigger bLightOff = new JoystickButton(m_driverController,1);
+  Trigger bResetOd = new JoystickButton(m_driver, 1);
 
   /** 
    * Dentro do container é que são guardados organizados os elementos do robo.
@@ -77,10 +87,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getLeftTriggerAxis())+(m_driverController.getRightTriggerAxis()*-1), 
-    //                          m_driverController.getRightX()*0.5), drive));
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
-    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driver.getLeftTriggerAxis())+(m_driver.getRightTriggerAxis()*-1), 
+                              m_driver.getRightX()*-0.5), drive));
+    bResetOd.onTrue(new DriveBalance());
+    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
+    //m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
 
 
     bLightOff.onTrue(new InstantCommand(()->limeLight.ledOn() ,limeLight));
@@ -126,6 +137,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return null;
+    return new DriveAndTurn(2,90);
   }
 }
