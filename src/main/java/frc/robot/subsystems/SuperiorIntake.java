@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class SuperiorIntake extends SubsystemBase {
+  private static SuperiorIntake instance;
   //Classe do motor do intake superior do  robo
   VictorSPX motor = new VictorSPX(IntakeConstants.kIntakeMotor);
   PWM blue = new PWM(IntakeConstants.kPWMChannelBlue);
@@ -54,6 +55,18 @@ public class SuperiorIntake extends SubsystemBase {
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Brake);
     motor.configOpenloopRamp(IntakeConstants.kRampRate);
+  }
+  public static SuperiorIntake getInstance() {
+    if (instance == null) {
+        instance = new SuperiorIntake(Element.None);
+    }
+    return instance;
+  }
+  public void setInitialElement(Element start){
+    if(lastElement==Element.None){
+      lastElement = start;
+    }
+    
   }
   /*
    * Função de captura  de elemento

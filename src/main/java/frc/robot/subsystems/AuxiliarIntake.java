@@ -14,6 +14,7 @@ import frc.robot.Constants.AuxiliarIntakeConstants;
  * Intake auxiliar, fica embaixo do robo
  */
 public class AuxiliarIntake extends SubsystemBase {
+  private static AuxiliarIntake instance;
   //Define o motor que foi usado
   //Um snowblower com um VictorSPX
   VictorSPX motor = new VictorSPX(AuxiliarIntakeConstants.kIntakeMotor);
@@ -23,6 +24,12 @@ public class AuxiliarIntake extends SubsystemBase {
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Coast);
   }
+  public static AuxiliarIntake getInstance() {
+    if (instance == null) {
+        instance = new AuxiliarIntake();
+    }
+    return instance;
+}
   public void setMotor(double power){
     motor.set(ControlMode.PercentOutput,power);
   }

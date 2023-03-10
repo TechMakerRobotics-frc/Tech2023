@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -27,19 +26,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // Cria um objeto de cada subsistema
-  private final Drivetrain drive = new Drivetrain();
-  private final Arm arm  = new Arm();
-  private final SuperiorIntake intake;
-  private final PDP pdp = new PDP();
-  private final AuxiliarIntake intakeAux = new AuxiliarIntake();
-  private final Limelight limeLight = new Limelight();
+  private final Drivetrain drive = Drivetrain.getInstance();
+  private final Arm arm  = Arm.getInstance();
+  private final SuperiorIntake intake = SuperiorIntake.getInstance();
+  private final PDP pdp = PDP.getInstance();
+  private final AuxiliarIntake intakeAux = AuxiliarIntake.getInstance();
+  private final Limelight limeLight = Limelight.getInstance();
   /**
   * Cria os controles para comandar
   * Usamos um controle de Xbox ou manche para navegação
   * E uma central de botões  para os mecanismos
   **/
 
-  //private final CommandXboxController m_driverController =      new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final Joystick m_driverController = new Joystick(OperatorConstants.kDriverControllerPort);
   private final Joystick m_operatorControlller = new Joystick(OperatorConstants.kOperatorControllerPort);
   //Cconfigura os eventos para o intake
@@ -67,11 +65,12 @@ public class RobotContainer {
    * Sao configurados os sistemas, associados os comandos aos botões, etc
    * */
   public RobotContainer() {
-    intake = new SuperiorIntake(Element.None);
     // A função de Bindings que associa os eventos dos controles aos comandos
     configureBindings();
+    arm.setMotorPower(-ArmConstants.kPowerWait);
   }
 
+ 
   /**
    * Aqui fazemos toda a configuração que associa eventos a comandos
    * Principais eventos são os comandos dos controles

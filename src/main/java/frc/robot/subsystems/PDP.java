@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.PDPConstants;
 
 public class PDP extends SubsystemBase {
+  private static PDP instance;
   /** Creates a new PDP. */
   PowerDistribution m_pdp = new PowerDistribution(PDPConstants.kID, PDPConstants.kModule);
 
@@ -18,6 +19,12 @@ public class PDP extends SubsystemBase {
   public boolean getLowVoltage(){
     return (m_pdp.getVoltage()<PDPConstants.kMinimumVoltage);
   }
+  public static PDP getInstance() {
+    if (instance == null) {
+        instance = new PDP();
+    }
+    return instance;
+}
 
   @Override
   public void periodic() {

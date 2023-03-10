@@ -20,9 +20,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxRelativeEncoder.Type;
 
 public class Drivetrain extends SubsystemBase {
+  private static Drivetrain instance;
+
   // Motores de tração
   private CANSparkMax motorLeftFront = new CANSparkMax(DrivetrainConstants.kMotorLeftFront, MotorType.kBrushless);
   private CANSparkMax motorLeftRear = new CANSparkMax(DrivetrainConstants.kMotorLeftRear, MotorType.kBrushless);
@@ -96,7 +97,12 @@ public class Drivetrain extends SubsystemBase {
         VecBuilder.fill(0.1, 0.1, 0.1));
 
   }
-
+  public static Drivetrain getInstance() {
+    if (instance == null) {
+        instance = new Drivetrain();
+    }
+    return instance;
+}
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {

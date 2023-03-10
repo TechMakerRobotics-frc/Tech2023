@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
 public class Arm extends SubsystemBase {
+  private static Arm instance;
   //Dois motores, um de  cada lado 
   CANSparkMax  motorLeft = new CANSparkMax(ArmConstants.kArmLeftMotor,MotorType.kBrushless);
   CANSparkMax  motorRight = new CANSparkMax (ArmConstants.kArmRighrMotor,MotorType.kBrushless);
@@ -23,6 +24,7 @@ public class Arm extends SubsystemBase {
   RelativeEncoder rightEncoder;
   /** Creates a new arm. */
   public Arm() {
+    
     //Limpo qualquer configuração  inicial dos modulos
     motorLeft.restoreFactoryDefaults();
     motorRight.restoreFactoryDefaults();
@@ -44,8 +46,13 @@ public class Arm extends SubsystemBase {
     rightEncoder.setPositionConversionFactor(1);
     resetEncoder();
     
-    
   }
+  public static Arm getInstance() {
+    if (instance == null) {
+        instance = new Arm();
+    }
+    return instance;
+}
   //Função principal que movimenta o braço para frente(+) e  para tras(-)
   public void setMotorPower(double forward) {
     SmartDashboard.putNumber("Braco Potencia (%)", forward * 100.0);
