@@ -33,30 +33,26 @@ public final class Constants {
     public static final SPI.Port NAVX_PORT = SPI.Port.kMXP;
     public static final double kGearboxRatio = 8.45;
     public static final double kWheelDiameterMeters = 6 * 0.0254;// converte 1 volta da roda em metros
-    public static final double kRampRate = 0.025;
     public static final double kMaxSpeedArmExtended = 0.4;
-    public static final double kp = 0.1;
-    public static final double ki = 0.0;
-    public static final double kd = 0.01;
     public static final int kCountsPerRevolution = 42;
     public static final double kTrackwidth = 28;
-    
     public static final int kEncoderCPR = 42;
     public static final double kWheelDiameterInches = 6;
     public static final double kEncoderDistancePerRotation = (kWheelDiameterMeters*Math.PI)/(kGearboxRatio);
-    
-    public static final double ks = 1.06;
-    public static final double kv = 2.49;
-    public static final double ka = 0.0375;
-    
-    public static final double kPDriveVel = 0.1;
-    public static final double kIDriveVel = 0.0;
-    public static final double kDDriveVel = 0.0;
-    
-    public static final double kMaxSpeed = 0.5;
-    public static final double kMaxAcceleration = 1;
-    public static final double kRamseteB = 2;
-    public static final double kRamseteZeta = 0.7;
+    public static final int kSlewRate = 3;
+    public static final double kVoltageConstraint = 10;
+    public static final double kTurnP = 1;
+    public static final double kTurnI = 0;
+    public static final double kTurnD = 0;
+    public static final double kTurnToleranceDeg = 5;
+    public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+
+    public static final double kDriveP = 1;
+    public static final double kDriveI = 0;
+    public static final double kDriveD = 0;
+    public static final double kDriveTolerance = 0.2;
+    public static final double kDriveRateToleranceMPerS = 2; // degrees per second
+
   }
 
   public static class IntakeConstants {

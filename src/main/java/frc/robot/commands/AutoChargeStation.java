@@ -5,7 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.autonomousConstants;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.SuperiorIntake.Element;
 
 public class AutoChargeStation extends SequentialCommandGroup {
@@ -14,7 +14,7 @@ public class AutoChargeStation extends SequentialCommandGroup {
       new ExtendArm(),
       new ReleaseElementIntake(start),
       new RetractArm(),
-      new DriveDistance(autonomousConstants.kDriveSpeed, 4),
+      new DriveDistance(4,Drivetrain.getInstance()),
       new DriveBalance()
     );
   }

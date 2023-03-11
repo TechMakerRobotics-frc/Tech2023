@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -52,6 +53,10 @@ public class Drivetrain extends SubsystemBase {
 
   private DifferentialDrivePoseEstimator m_poseEstimator;
 
+    // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
+    private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
+    private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
+  
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     // Reseto qualquer configuração nos modulos e refaço elas do zero
@@ -129,7 +134,7 @@ public void resetPose(Pose2d newPose) {
     SmartDashboard.putNumber("Giro", getYaw());
     SmartDashboard.putNumber("Roll", getRoll());
     SmartDashboard.putNumber("Angle", getPitch());   
-    SmartDashboard.putData("Field",field);
+    SmartDashboard.putData("Train",m_diffDrive);
 
     m_poseEstimator.update(m_gyro.getRotation2d(),
         getLeftDistanceMeters(),
@@ -142,15 +147,19 @@ public void resetPose(Pose2d newPose) {
    */
 
   // Função principal, movimenta o robo para frente e com curva
-  public void setDriveMotors(double forward, double turn) {
-    SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
-    SmartDashboard.putNumber("Potencia Curva (%)", turn * 100.0);
+  public void setDriveMotors(double forward, double rotation ) {
+    final var xSpeed = m_speedLimiter.calculate(forward);
+
+    final var rot = m_rotLimiter.calculate(rotation);
+
+    SmartDashboard.putNumber("Potencia Frente (%)", xSpeed * 100.0);
+    SmartDashboard.putNumber("Potencia Curva (%)", rot * 100.0);
 
     /*
      * Volta positiva = Anti horario, esquerda vai para tras
      */
-    double left = forward - turn;
-    double right = forward + turn;
+    double left = xSpeed - rot;
+    double right = xSpeed + rot;
     tankDrive(left, right);
 
   }
@@ -165,6 +174,7 @@ public void resetPose(Pose2d newPose) {
     else
       m_diffDrive.setMaxOutput(1.0);
   }
+
   public void breake(boolean set){
     if(set){
       motorLeftFront.setIdleMode(IdleMode.kBrake);
@@ -180,9 +190,13 @@ public void resetPose(Pose2d newPose) {
     }
   }
   public void arcadeDrive(double forward, double rotation) {
-    SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
-    SmartDashboard.putNumber("Potencia Curva (%)", rotation * 100.0);
-    m_diffDrive.arcadeDrive(forward, rotation);
+    final var xSpeed = m_speedLimiter.calculate(forward);
+
+    final var rot = m_rotLimiter.calculate(rotation);
+
+    SmartDashboard.putNumber("Potencia Frente (%)", xSpeed * 100.0);
+    SmartDashboard.putNumber("Potencia Curva (%)", rot * 100.0);
+    m_diffDrive.arcadeDrive(xSpeed, rot);
     m_diffDrive.feed();
 
   }

@@ -16,9 +16,9 @@ public class DriveAndTurn extends SequentialCommandGroup {
     addCommands(
       new ResetOdometry(),
       new InstantCommand(()->drive.breake(true),drive),
-      new DriveDistance(0.4, distance),
+      new DriveDistance(distance,drive),
       new WaitCommand(0.5),
-      new DriveAngle(0.5, angle)
+      new DriveAngle(angle,drive)
     );
   }
 }

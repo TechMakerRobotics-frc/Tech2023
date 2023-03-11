@@ -7,8 +7,6 @@ import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoTaxi;
-import frc.robot.commands.DriveAndTurn;
-import frc.robot.commands.DriveBalance;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;

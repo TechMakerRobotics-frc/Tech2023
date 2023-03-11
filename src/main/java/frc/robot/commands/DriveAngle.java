@@ -4,7 +4,9 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain;
 
 /**
@@ -15,47 +17,37 @@ import frc.robot.subsystems.Drivetrain;
    * @param angle The number of meters the robot will drive
    * @param drive The drivetrain subsystem on which this command will run
    */
-public class DriveAngle extends CommandBase {
-  private final Drivetrain m_drive;
-  private final double m_angle;
-  private final double m_speed;
-
+public class DriveAngle extends PIDCommand {
+  
   /*
    * Criação do comando capturando os dados
    */
-  public DriveAngle(double speed, double angle) {
+  public DriveAngle( double angle, Drivetrain drive) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_drive = Drivetrain.getInstance();
-    m_angle = angle;
-    m_speed = speed;
+    super(
+        new PIDController(DrivetrainConstants.kTurnP, DrivetrainConstants.kTurnI, DrivetrainConstants.kTurnD),
+        // Close loop on heading
+        drive::getYaw,
+        // Set reference to target
+        angle,
+        // Pipe output to turn robot
+        output -> drive.arcadeDrive(0, output),
+        // Require the drive
+        drive);
+
+    // Set the controller to be continuous (because it is an angle controller)
+    getController().enableContinuousInput(-180, 180);
+    // Set the controller tolerance - the delta tolerance ensures the robot is stationary at the
+    // setpoint before it is considered as having reached the reference
+    getController()
+        .setTolerance(DrivetrainConstants.kTurnToleranceDeg, DrivetrainConstants.kTurnRateToleranceDegPerS);
 
   }
 
-  /*
-   * Inicializa as variaveis
-   */
-  @Override
-  public void initialize() {
-    m_drive.arcadeDrive(0, 0);
-    m_drive.resetYaw();
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_drive.arcadeDrive(0, m_speed);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(m_angle>0){
-      return Math.abs(m_drive.getYaw()) >= m_angle;
-    }
-    return Math.abs(m_drive.getYaw()) <= m_angle;
+    return getController().atSetpoint();
   }
 }

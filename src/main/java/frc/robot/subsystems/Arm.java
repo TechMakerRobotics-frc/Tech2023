@@ -56,7 +56,8 @@ public class Arm extends SubsystemBase {
   //Função principal que movimenta o braço para frente(+) e  para tras(-)
   public void setMotorPower(double forward) {
     SmartDashboard.putNumber("Braco Potencia (%)", forward * 100.0);
-
+    
+    
     motorRight.set(forward);
     motorLeft.set(forward);
     

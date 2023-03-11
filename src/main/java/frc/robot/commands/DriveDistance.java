@@ -4,56 +4,43 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
-public class DriveDistance extends CommandBase {
-  private final Drivetrain m_drive;
-  private final double m_distance;
-  private final double m_speed;
+public class DriveDistance extends PIDCommand {
 
   /**
-   * Creates a new DriveDistance. This command will drive your your robot for a desired distance at
+   * Creates a new DriveDistance. This command will drive your your robot for a
+   * desired distance at
    * a desired speed.
    *
-   * @param speed The speed at which the robot will drive
-   * @param meters The number of meters the robot will drive
-   * @param drive The drivetrain subsystem on which this command will run
+   * @param distance The number of meters the robot will drive
+   * @param drive  The drivetrain subsystem on which this command will run
    */
-  public DriveDistance(double speed, double meters) {
-    m_drive = Drivetrain.getInstance();
-    m_distance = meters;
-    m_speed = speed;
-    
-  }
+  public DriveDistance(double distance, Drivetrain drive) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    super(
+        new PIDController(DrivetrainConstants.kDriveD, DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveD),
+        // Close loop on heading
+        drive::GetAverageEncoderDistance,
+        // Set reference to target
+        distance,
+        // Pipe output to turn robot
+        output -> drive.arcadeDrive(output,0),
+        // Require the drive
+        drive);
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    m_drive.arcadeDrive(0, 0);
-    m_drive.resetEncoders();
-    SmartDashboard.putNumber(getName(), m_distance);
+    // Set the controller tolerance - the delta tolerance ensures the robot is
+    // stationary at the
+    // setpoint before it is considered as having reached the reference
+    getController()
+        .setTolerance(DrivetrainConstants.kDriveTolerance, DrivetrainConstants.kDriveRateToleranceMPerS);
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_drive.arcadeDrive(m_speed, 0);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    SmartDashboard.putString(getName(), "Ended");
-    m_drive.arcadeDrive(0, 0);
-  }
-
-  // Returns true when the command should end.
+ // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // Compare distance travelled from start to desired distance
-    return Math.abs(m_drive.GetAverageEncoderDistance()) >= m_distance;
+    return getController().atSetpoint();
   }
 }

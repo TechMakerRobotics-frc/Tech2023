@@ -22,6 +22,7 @@ public class SuperiorIntake extends SubsystemBase {
   PWM blue = new PWM(IntakeConstants.kPWMChannelBlue);
   PWM red = new PWM(IntakeConstants.kPWMChannelRed);
   PWM green = new PWM(IntakeConstants.kPWMChannelGreen);
+  double timeoutColor = 0;
   //Cria uma lista de elementos possiveis. Assim associamos diversas caracteristicas
   // dos elementos para ser usado internamente  na classe
   public enum Element{
@@ -92,10 +93,20 @@ public class SuperiorIntake extends SubsystemBase {
   }
   public void intakeElement(Element element){
     if(lastElement==Element.None || lastElement==element){
-      if(element==Element.Cube)
+      if(element==Element.Cube){
         motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
-      if(element==Element.Cone)
-      motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
+        timeoutColor = Timer.getFPGATimestamp()+10;
+        red.setRaw(100);
+        green.setRaw(0);
+        blue.setRaw(200);
+      }
+      if(element==Element.Cone){
+        motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
+        timeoutColor = Timer.getFPGATimestamp()+10;
+        red.setRaw(200);
+        green.setRaw(100);
+        blue.setRaw(0);
+      }
       
       lastElement = element;
       
@@ -110,14 +121,19 @@ public class SuperiorIntake extends SubsystemBase {
       time = Timer.getFPGATimestamp()+1;
       motor.set(VictorSPXControlMode.PercentOutput, lastElement.getDirection()*-1);
       lastElement = Element.None;
+      setLedTeamColor();
     }
   }
   //O periodico atualiza o Dashboard, alem de parar o motor depois do tempo  de cada elemento
   @Override
   public void periodic() {
     SmartDashboard.putString("Elemento atual", lastElement.getName());
-    if(Timer.getFPGATimestamp()>time && lastElement==Element.None)
+    if(Timer.getFPGATimestamp()>time && lastElement==Element.None){
       motor.set(VictorSPXControlMode.PercentOutput, 0);
+    }
+    if(Timer.getFPGATimestamp()>timeoutColor){
+      setLedTeamColor();
+    }
 
   }
 }

@@ -10,17 +10,20 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.autonomousConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.SuperiorIntake;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class RetractArm extends SequentialCommandGroup {
   Arm arm = Arm.getInstance();
+  SuperiorIntake intake = SuperiorIntake.getInstance();
   public RetractArm() {
     addCommands(
       new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm),
       new WaitCommand(autonomousConstants.kExtendArmTime),
-      new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm)
+      new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm),
+      new InstantCommand(()->intake.setLedTeamColor(),intake)
     );
   }
 }
