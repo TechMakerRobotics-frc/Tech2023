@@ -5,6 +5,8 @@ package frc.robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.AutoChargeStation;
+import frc.robot.commands.AutoTaxi;
 import frc.robot.commands.DriveAndTurn;
 import frc.robot.commands.DriveBalance;
 import frc.robot.subsystems.Arm;
@@ -163,7 +165,12 @@ public class RobotContainer {
     System.out.println("Auto selected: " + m_autoSelected);
     m_autoSelectedElement = m_chooserElement.getSelected();
     System.out.println("element selected: " + m_autoSelectedElement.name());
-
-    return new DriveAndTurn(2,90);
+    if(m_autoSelected==kTaxi){
+      return new AutoTaxi(m_autoSelectedElement);
+    }
+    if(m_autoSelected==kchargerStation){
+      return new AutoChargeStation(m_autoSelectedElement);
+    }
+    return null;
   }
 }
