@@ -47,7 +47,7 @@ public class DriveBalance extends CommandBase {
     else if(Math.abs(drive.getRoll())>autonomousConstants.kMaxAngle && startPositioning==false){
       startPositioning = true;
       drive.resetEncoders();
-      drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
+      drive.tankDriveVolts(autonomousConstants.kDriveVoltage, autonomousConstants.kDriveVoltage);
     }
     else if(startPositioning){
       
@@ -56,21 +56,21 @@ public class DriveBalance extends CommandBase {
           lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
           direction = (int)(lastDistance/Math.abs(lastDistance));
           double speed = (lastDistancePosition>=1?(autonomousConstants.kDriveSpeedSlow*direction):autonomousConstants.kDriveSpeed);
-          drive.arcadeDrive(speed, 0);
+          drive.tankDriveVolts(speed, speed);
           drive.resetEncoders();
 
       }
       else if(waiting)
       {
-        drive.arcadeDrive(0,0);
+        drive.stopDrivetrain();
       }
       else{
-        drive.arcadeDrive(autonomousConstants.kDriveSpeed*direction, 0);
+        drive.tankDriveVolts(autonomousConstants.kDriveSpeed*direction,autonomousConstants.kDriveSpeed*direction);
       }
       if(lastDistancePosition>=autonomousConstants.kDistanceToPark.length-1)
       {
         parked=true;
-        drive.arcadeDrive(0, 0);
+        drive.stopDrivetrain();
         drive.resetEncoders();
         timeout = Timer.getFPGATimestamp()+5;
       }
