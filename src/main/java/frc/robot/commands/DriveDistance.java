@@ -6,10 +6,6 @@ package frc.robot.commands;
 
 import frc.robot.subsystems.Drivetrain;
 
-import java.io.Console;
-import java.io.OutputStream;
-import java.io.PrintStream;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 

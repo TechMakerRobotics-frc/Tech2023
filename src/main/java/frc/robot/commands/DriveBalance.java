@@ -18,7 +18,6 @@ public class DriveBalance extends CommandBase {
   boolean startPositioning = false;
   boolean waiting = false;
   int direction = 1;
-  DriveDistance d;
   double timeout;
   public DriveBalance() {
     drive.resetEncoders();
@@ -27,6 +26,12 @@ public class DriveBalance extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    lastDistancePosition = 0;
+    lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
+    parked = false;
+    startPositioning = false;
+    waiting = false;
+    direction = 1;
     drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
     drive.breake(true);
     drive.resetEncoders();
@@ -67,6 +72,7 @@ public class DriveBalance extends CommandBase {
         parked=true;
         drive.arcadeDrive(0, 0);
         drive.resetEncoders();
+        timeout = Timer.getFPGATimestamp()+5;
       }
       SmartDashboard.putNumber("Distancia atual", drive.GetAverageEncoderDistance());
       SmartDashboard.putNumber("Distancia", lastDistance);
@@ -88,6 +94,6 @@ public class DriveBalance extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return (Timer.getFPGATimestamp()>timeout);
   }
 }

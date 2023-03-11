@@ -14,7 +14,6 @@ import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.PDP;
 import frc.robot.subsystems.SuperiorIntake;
 import frc.robot.subsystems.SuperiorIntake.Element;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
