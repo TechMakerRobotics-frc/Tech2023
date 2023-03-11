@@ -180,7 +180,10 @@ public void resetPose(Pose2d newPose) {
     }
   }
   public void arcadeDrive(double forward, double rotation) {
+    SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
+    SmartDashboard.putNumber("Potencia Curva (%)", rotation * 100.0);
     m_diffDrive.arcadeDrive(forward, rotation);
+    m_diffDrive.feed();
 
   }
 

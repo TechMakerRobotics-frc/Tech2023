@@ -12,10 +12,14 @@ import frc.robot.subsystems.Drivetrain;
 
 public class DriveBalance extends CommandBase {
   Drivetrain drive = Drivetrain.getInstance();
-  double setpoint = 0;
-  double errorSum = 0;
-  double lastTimestamp = 0;
-  double lastError = 0;   
+  int lastDistancePosition = 0;
+  double lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
+  boolean parked = false;
+  boolean startPositioning = false;
+  boolean waiting = false;
+  int direction = 1;
+  DriveDistance d;
+  double timeout;
   public DriveBalance() {
     drive.resetEncoders();
   }
@@ -23,44 +27,73 @@ public class DriveBalance extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    drive.arcadeDrive(0, 0);
+    drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
     drive.breake(true);
-    drive.removeDefaultCommand();
+    drive.resetEncoders();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
-    // get sensor position
-    double sensorPosition = drive.getRoll();
-
-    double kP = SmartDashboard.getNumber("kP", autonomousConstants.kP);
-    double kI = SmartDashboard.getNumber("kI", autonomousConstants.kI);
-    double kD = SmartDashboard.getNumber("kD", autonomousConstants.kD);
-    // calculations
-    double error = setpoint - sensorPosition;
-    double dt = Timer.getFPGATimestamp() - lastTimestamp;
-
-    if (Math.abs(error) < autonomousConstants.kLimit) {
-      errorSum += error * dt;
+    if(parked){
+      drive.arcadeDrive(drive.GetAverageEncoderDistance()*-20, 0);
+      
     }
+    else if(Math.abs(drive.getRoll())>autonomousConstants.kMaxAngle && startPositioning==false){
+      startPositioning = true;
+      drive.resetEncoders();
+      drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
+    }
+    else if(startPositioning){
+      
+      if(Math.abs(drive.GetAverageEncoderDistance()) >= Math.abs(lastDistance) && waiting==false){
+        timeout = Timer.getFPGATimestamp()+0.75;
+        drive.arcadeDrive(0, 0);
+        waiting = true;
+      }
+      if(Timer.getFPGATimestamp()>timeout && waiting){
+        if(Math.abs(drive.getRoll())>autonomousConstants.kMinAngle){
+          waiting = false;
+          lastDistancePosition++;
+          lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
+          direction = (lastDistancePosition%2==0?1:-1);
+          double speed = (lastDistancePosition>=1?(autonomousConstants.kDriveSpeedSlow*direction):autonomousConstants.kDriveSpeed);
+          drive.arcadeDrive(speed, 0);
+          drive.resetEncoders();
+        } else{
+          parked = true;
+        }
 
-    double errorRate = (error - lastError) / dt;
-
-    double outputSpeed = kP * error + kI * errorSum + kD * errorRate;
-
-    drive.arcadeDrive(outputSpeed, 0);
-
-    // update last- variables
-    lastTimestamp = Timer.getFPGATimestamp();
-    lastError = error;
+      }
+      else if(waiting)
+      {
+        drive.arcadeDrive(0,0);
+      }
+      else{
+        drive.arcadeDrive(autonomousConstants.kDriveSpeed*direction, 0);
+      }
+      if(lastDistancePosition>=autonomousConstants.kDistanceToPark.length-1)
+      {
+        parked=true;
+        drive.arcadeDrive(0, 0);
+        drive.resetEncoders();
+      }
+      SmartDashboard.putNumber("Distancia atual", drive.GetAverageEncoderDistance());
+      SmartDashboard.putNumber("Distancia", lastDistance);
+      SmartDashboard.putNumber("Sinal", direction);
+      
+    }
+    else if(startPositioning==false){
+      drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
+    }
+   
 
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

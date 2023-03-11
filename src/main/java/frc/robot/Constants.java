@@ -101,15 +101,11 @@ public final class Constants {
   }
 
   public static class autonomousConstants{
-    public static final double kDistanceToPark = 2.3;
-    public static final double kDriveSpeed = 0.6;
+    public static final double kDistanceToPark[] = {1.4,-0.45,0.05};
+    public static final double kDriveSpeed = 0.35;
     public static final double kDriveSpeedSlow = 0.3;
-    public static final double kMaxAngle= 2;
-    public static final double kMaxDistance = 0.3;
-    public static final double kP = 0.02;
-    public static final double kI = 0.05;
-    public static final double kD = 0.01;
-    public static final double kLimit = 2;
+    public static final double kMaxAngle= 4;
+    public static final double kMinAngle = 0.75;
 
   }
 
