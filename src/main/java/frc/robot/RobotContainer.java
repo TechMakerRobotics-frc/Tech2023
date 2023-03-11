@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -68,12 +69,35 @@ public class RobotContainer {
   Trigger bLightOn = new JoystickButton(m_driverController,2);
   Trigger bLightOff = new JoystickButton(m_driverController,1);
   Trigger bResetOd = new JoystickButton(m_driver, 1);
+  private Element m_autoSelectedElement;
+  private final SendableChooser<Element> m_chooserElement = new SendableChooser<>();
+  private static final String kNothingAuto = "nothing";
+  private static final String kchargerStation = "station";
+  private static final String kTaxi = "leave";
+  private String m_autoSelected;
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+
+
 
   /** 
    * Dentro do container é que são guardados organizados os elementos do robo.
    * Sao configurados os sistemas, associados os comandos aos botões, etc
    * */
   public RobotContainer() {
+    m_chooserElement.setDefaultOption("Cone", Element.Cone);
+    m_chooserElement.addOption("Cubo", Element.Cube);
+    m_chooserElement.addOption("Nada", Element.None);
+    SmartDashboard.putData("Elemento", m_chooserElement);
+    m_chooser.setDefaultOption("Ficar Parado", kNothingAuto);
+    m_chooser.addOption("Subir na Charger Station", kchargerStation);
+    m_chooser.addOption("Sair da area", kTaxi);
+    SmartDashboard.putData("Comportamento", m_chooser);
+
+
+
+
+
     // A função de Bindings que associa os eventos dos controles aos comandos
     configureBindings();
     arm.setMotorPower(-ArmConstants.kPowerWait);
@@ -135,7 +159,11 @@ public class RobotContainer {
    * Seta tambem o intake para saber qual elemento inicia no autonomo
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+    m_autoSelected = m_chooser.getSelected();
+    System.out.println("Auto selected: " + m_autoSelected);
+    m_autoSelectedElement = m_chooserElement.getSelected();
+    System.out.println("element selected: " + m_autoSelectedElement.name());
+
     return new DriveAndTurn(2,90);
   }
 }
