@@ -46,23 +46,13 @@ public class DriveBalance extends CommandBase {
     }
     else if(startPositioning){
       
-      if(Math.abs(drive.GetAverageEncoderDistance()) >= Math.abs(lastDistance) && waiting==false){
-        timeout = Timer.getFPGATimestamp()+0.75;
-        drive.arcadeDrive(0, 0);
-        waiting = true;
-      }
-      if(Timer.getFPGATimestamp()>timeout && waiting){
-        if(Math.abs(drive.getRoll())>autonomousConstants.kMinAngle){
-          waiting = false;
+      if(Math.abs(drive.GetAverageEncoderDistance()) >= Math.abs(lastDistance)){
           lastDistancePosition++;
           lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
-          direction = (lastDistancePosition%2==0?1:-1);
+          direction = (int)(lastDistance/Math.abs(lastDistance));
           double speed = (lastDistancePosition>=1?(autonomousConstants.kDriveSpeedSlow*direction):autonomousConstants.kDriveSpeed);
           drive.arcadeDrive(speed, 0);
           drive.resetEncoders();
-        } else{
-          parked = true;
-        }
 
       }
       else if(waiting)
