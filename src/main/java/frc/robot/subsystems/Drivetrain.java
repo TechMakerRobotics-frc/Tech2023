@@ -5,11 +5,15 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -43,7 +47,6 @@ public class Drivetrain extends SubsystemBase {
 
   // Placa de navegação
   private AHRS m_gyro;
-  
 
   // Odometry class for tracking robot pose
   private DifferentialDriveKinematics kinematics;
@@ -53,10 +56,13 @@ public class Drivetrain extends SubsystemBase {
 
   private DifferentialDrivePoseEstimator m_poseEstimator;
 
-    // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-    private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
-    private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
-  
+  // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
+  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
+  private final PIDController m_leftPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
+  private final PIDController m_rightPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
+
   /** Creates a new Drivetrain. */
   public Drivetrain() {
     // Reseto qualquer configuração nos modulos e refaço elas do zero
@@ -78,9 +84,9 @@ public class Drivetrain extends SubsystemBase {
     rightEncoder1 = motorRightRear.getEncoder();
     leftEncoder2 = motorLeftFront.getEncoder();
     rightEncoder2 = motorRightFront.getEncoder();
-    
+
     // Configuro o fator do encoder para 1 - 1 pulso por volta.
-     leftEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
+    leftEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
     leftEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
     rightEncoder1.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
     rightEncoder2.setPositionConversionFactor(DrivetrainConstants.kEncoderDistancePerRotation);
@@ -96,8 +102,7 @@ public class Drivetrain extends SubsystemBase {
     m_gyro = new AHRS(DrivetrainConstants.NAVX_PORT);
     resetYaw();
     Pose2d initialPose = new Pose2d(0, 1.5, m_gyro.getRotation2d());
-    kinematics =
-            new DifferentialDriveKinematics(Units.inchesToMeters(DrivetrainConstants.kTrackwidth));
+    kinematics = new DifferentialDriveKinematics(Units.inchesToMeters(DrivetrainConstants.kTrackwidth));
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(),
         getLeftDistanceMeters(), getRightDistanceMeters(),
         initialPose);
@@ -110,21 +115,52 @@ public class Drivetrain extends SubsystemBase {
         VecBuilder.fill(0.1, 0.1, 0.1));
 
   }
+
   public static Drivetrain getInstance() {
     if (instance == null) {
-        instance = new Drivetrain();
+      instance = new Drivetrain();
     }
     return instance;
-}
-public void updatePose() {
-  m_odometry.update(m_gyro.getRotation2d(), Units.inchesToMeters(leftEncoder1.getPosition()), Units.inchesToMeters(rightEncoder1.getPosition()));
-  field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+  }
+  /**
+   * Sets the desired wheel speeds.
+   *
+   * @param speeds The desired wheel speeds.
+   */
+  public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
+    final double leftFeedforward = m_feedforward.calculate(speeds.leftMetersPerSecond);
+    final double rightFeedforward = m_feedforward.calculate(speeds.rightMetersPerSecond);
 
-}
+    final double leftOutput =
+        m_leftPIDController.calculate(leftEncoder1.getVelocity(), speeds.leftMetersPerSecond);
+    final double rightOutput =
+        m_rightPIDController.calculate(rightEncoder1.getVelocity(), speeds.rightMetersPerSecond);
+    m_leftMotor.setVoltage(leftOutput + leftFeedforward);
+    m_rightMotor.setVoltage(rightOutput + rightFeedforward);
+  }
 
-public void resetPose(Pose2d newPose) {
-  m_poseEstimator.resetPosition(m_gyro.getRotation2d(), leftEncoder1.getPosition(), rightEncoder1.getPosition(), newPose);
-}
+  /**
+   * Drives the robot with the given linear velocity and angular velocity.
+   *
+   * @param xSpeed Linear velocity in m/s.
+   * @param rot Angular velocity in rad/s.
+   */
+  public void drive(double xSpeed, double rot) {
+    var wheelSpeeds = kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
+    setSpeeds(wheelSpeeds);
+  }
+  public void updatePose() {
+    m_odometry.update(m_gyro.getRotation2d(), Units.inchesToMeters(leftEncoder1.getPosition()),
+        Units.inchesToMeters(rightEncoder1.getPosition()));
+    field.setRobotPose(m_poseEstimator.getEstimatedPosition());
+
+  }
+
+  public void resetPose(Pose2d newPose) {
+    m_poseEstimator.resetPosition(m_gyro.getRotation2d(), leftEncoder1.getPosition(), rightEncoder1.getPosition(),
+        newPose);
+  }
+
   // Periodico só atualiza os dados no Dashboard para informações
   @Override
   public void periodic() {
@@ -133,8 +169,8 @@ public void resetPose(Pose2d newPose) {
     SmartDashboard.putNumber("Distancia Total", GetAverageEncoderDistance());
     SmartDashboard.putNumber("Giro", getYaw());
     SmartDashboard.putNumber("Roll", getRoll());
-    SmartDashboard.putNumber("Angle", getPitch());   
-    SmartDashboard.putData("Train",m_diffDrive);
+    SmartDashboard.putNumber("Angle", getPitch());
+    SmartDashboard.putData("Train", m_diffDrive);
 
     m_poseEstimator.update(m_gyro.getRotation2d(),
         getLeftDistanceMeters(),
@@ -147,7 +183,7 @@ public void resetPose(Pose2d newPose) {
    */
 
   // Função principal, movimenta o robo para frente e com curva
-  public void setDriveMotors(double forward, double rotation ) {
+  public void setDriveMotors(double forward, double rotation) {
     final var xSpeed = m_speedLimiter.calculate(forward);
 
     final var rot = m_rotLimiter.calculate(rotation);
@@ -169,34 +205,31 @@ public void resetPose(Pose2d newPose) {
    * importante quando o braço está extendido
    */
   public void setMaxOutput(boolean set) {
-    if(set)
+    if (set)
       m_diffDrive.setMaxOutput(DrivetrainConstants.kMaxSpeedArmExtended);
     else
       m_diffDrive.setMaxOutput(1.0);
   }
 
-  public void breake(boolean set){
-    if(set){
+  public void breake(boolean set) {
+    if (set) {
       motorLeftFront.setIdleMode(IdleMode.kBrake);
       motorLeftRear.setIdleMode(IdleMode.kBrake);
       motorRightFront.setIdleMode(IdleMode.kBrake);
       motorRightRear.setIdleMode(IdleMode.kBrake);
-    }
-    else{
+    } else {
       motorLeftFront.setIdleMode(IdleMode.kCoast);
       motorLeftRear.setIdleMode(IdleMode.kCoast);
       motorRightFront.setIdleMode(IdleMode.kCoast);
       motorRightRear.setIdleMode(IdleMode.kCoast);
     }
   }
+
   public void arcadeDrive(double forward, double rotation) {
-    final var xSpeed = m_speedLimiter.calculate(forward);
 
-    final var rot = m_rotLimiter.calculate(rotation);
-
-    SmartDashboard.putNumber("Potencia Frente (%)", xSpeed * 100.0);
-    SmartDashboard.putNumber("Potencia Curva (%)", rot * 100.0);
-    m_diffDrive.arcadeDrive(xSpeed, rot);
+    SmartDashboard.putNumber("Potencia Frente (%)", forward * 100.0);
+    SmartDashboard.putNumber("Potencia Curva (%)", rotation * 100.0);
+    m_diffDrive.arcadeDrive(forward, rotation);
     m_diffDrive.feed();
 
   }
@@ -206,12 +239,14 @@ public void resetPose(Pose2d newPose) {
     m_rightMotor.setVoltage(right);
     m_diffDrive.feed();
   }
+
   public void tankDrive(double left, double right) {
     m_leftMotor.set(left);
     m_rightMotor.set(right);
     m_diffDrive.feed();
-    
+
   }
+
   public void stopDrivetrain() {
     tankDriveVolts(0, 0);
   }
@@ -250,13 +285,15 @@ public void resetPose(Pose2d newPose) {
   public double getLeftEncoder() {
     return (leftEncoder1.getPosition() + leftEncoder2.getPosition()) / 2.0;
   }
- // função de reset dos encoders definindo ponto inicial do robo
- public void resetEncoders() {
-  leftEncoder1.setPosition(0);
-  leftEncoder2.setPosition(0);
-  rightEncoder1.setPosition(0);
-  rightEncoder2.setPosition(0);
-}
+
+  // função de reset dos encoders definindo ponto inicial do robo
+  public void resetEncoders() {
+    leftEncoder1.setPosition(0);
+    leftEncoder2.setPosition(0);
+    rightEncoder1.setPosition(0);
+    rightEncoder2.setPosition(0);
+  }
+
   /**
    * Funções de telemetria
    */
@@ -274,14 +311,15 @@ public void resetPose(Pose2d newPose) {
     m_gyro.reset();
   }
 
-  public double getRoll(){
+  public double getRoll() {
     return m_gyro.getRoll();
   }
 
-  public double getPitch(){
+  public double getPitch() {
     return m_gyro.getPitch();
   }
-   /**
+
+  /**
    * Zeroes the heading of the robot
    */
   public void zeroHeading() {

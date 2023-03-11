@@ -51,7 +51,9 @@ public final class Constants {
     public static final double kDriveI = 0;
     public static final double kDriveD = 0;
     public static final double kDriveTolerance = 0.2;
-    public static final double kDriveRateToleranceMPerS = 2; // degrees per second
+    public static final double kDriveRateToleranceMPerS = 2; // meters per second
+    public static final double kS = 1;
+    public static final double kV = 3;
 
   }
 
