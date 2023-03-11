@@ -106,6 +106,7 @@ public final class Constants {
     public static final double kDriveSpeedSlow = 0.3;
     public static final double kMaxAngle= 5;
     public static final double kMinAngle = 0.75;
+    public static final double kExtendArmTime = 2;
 
   }
 
