@@ -112,11 +112,11 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driver.getLeftY()*-1, 
-                              m_driver.getRightX()*-0.5), drive));
-    bResetOd.onTrue(new DriveBalance());
-    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
-    //m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
+    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driver.getLeftY()*-1, 
+    //                          m_driver.getRightX()*-0.5), drive));
+    //bResetOd.onTrue(new DriveBalance());
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
+    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
 
 
     bLightOff.onTrue(new InstantCommand(()->limeLight.ledOn() ,limeLight));
