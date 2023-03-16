@@ -76,17 +76,10 @@ public class SuperiorIntake extends SubsystemBase {
    * Ainda, ajusta o  timer, para que o  motor só gire pouco tempo, o  suficiente para manter  o  elemento
    */
   public void setLedTeamColor(){
-    DriverStation.Alliance color;
-	  color = DriverStation.getAlliance();
-	  if(color == DriverStation.Alliance.Blue){
-        blue.setRaw(200);
+        blue.setRaw(0);
         red.setRaw(0);
         green.setRaw(0);
-	  }else {
-      blue.setRaw(0);
-      red.setRaw(200);
-      green.setRaw(0);
-	  }
+	 
 
 
 
@@ -96,15 +89,15 @@ public class SuperiorIntake extends SubsystemBase {
       if(element==Element.Cube){
         motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
         timeoutColor = Timer.getFPGATimestamp()+10;
-        red.setRaw(100);
+        red.setRaw(0);
         green.setRaw(0);
-        blue.setRaw(200);
+        blue.setRaw(255);
       }
       if(element==Element.Cone){
         motor.set(VictorSPXControlMode.PercentOutput, element.getDirection());
         timeoutColor = Timer.getFPGATimestamp()+10;
-        red.setRaw(200);
-        green.setRaw(100);
+        red.setRaw(0);
+        green.setRaw(255);
         blue.setRaw(0);
       }
       

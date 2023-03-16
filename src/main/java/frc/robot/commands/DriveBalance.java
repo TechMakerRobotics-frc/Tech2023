@@ -20,12 +20,6 @@ public class DriveBalance extends CommandBase {
   int direction = 1;
   double timeout;
   public DriveBalance() {
-    drive.resetEncoders();
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
     lastDistancePosition = 0;
     lastDistance = autonomousConstants.kDistanceToPark[lastDistancePosition];
     parked = false;
@@ -35,6 +29,12 @@ public class DriveBalance extends CommandBase {
     drive.arcadeDrive(autonomousConstants.kDriveSpeed, 0);
     drive.breake(true);
     drive.resetEncoders();
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+   
   }
 
   // Called every time the scheduler runs while the command is scheduled.

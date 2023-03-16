@@ -39,7 +39,8 @@ public final class Constants {
     public static final int kEncoderCPR = 42;
     public static final double kWheelDiameterInches = 6;
     public static final double kEncoderDistancePerRotation = (kWheelDiameterMeters*Math.PI)/(kGearboxRatio);
-    public static final int kSlewRate = 3;
+    public static final int kSlewRateFoward = 1;
+    public static final double kSlewRateTurn = 0.5;
     public static final double kVoltageConstraint = 10;
     public static final double kTurnP = 1;
     public static final double kTurnI = 0;
@@ -106,7 +107,7 @@ public final class Constants {
     public static final double kDriveVoltageSlow = 3;
     public static final double kMaxAngle= 5;
     public static final double kMinAngle = 0.75;
-    public static final double kExtendArmTime = 2;
+    public static final double kExtendArmTime = 1.5;
 
   }
 

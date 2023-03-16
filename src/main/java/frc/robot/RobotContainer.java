@@ -7,6 +7,7 @@ import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoTaxi;
+import frc.robot.commands.DriveBalance;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -100,21 +101,21 @@ public class RobotContainer {
 
     // A função de Bindings que associa os eventos dos controles aos comandos
     configureBindings();
-    arm.setMotorPower(-ArmConstants.kPowerWait);
+    intake.setLedTeamColor();
   }
 
  
   /**
    * Aqui fazemos toda a configuração que associa eventos a comandos
-   * Principais eventos são os comandos dos controles
+   * Principais eventos são os comandos dos controles'
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
     //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driver.getLeftY()*-1, 
     //                          m_driver.getRightX()*-0.5), drive));
     //bResetOd.onTrue(new DriveBalance());
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)), 
-    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)), drive));
+    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)*-1), 
+    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)*-1), drive));
 
 
     bLightOff.onTrue(new InstantCommand(()->limeLight.ledOn() ,limeLight));
@@ -124,11 +125,12 @@ public class RobotContainer {
     
 
     bLevelHigh.onTrue(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPower),arm))
-              .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
+              .onFalse(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPowerWait),arm));
     bLevelLow.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm))
               .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
-    bLevelKeepHigh.onTrue(new InstantCommand(()->arm.setMotorPower(ArmConstants.kPowerWait),arm));
-    bLevelKeepLow.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm));
+   
+    bLevelKeepLow.onTrue(new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm))
+      .onFalse(new InstantCommand(()->arm.setMotorPower(0),arm));
     //Seta elementos de intake com comandos do controles de  navegação
 
     bBreake.onTrue(new InstantCommand(()->drive.breake(true),drive))
@@ -150,7 +152,6 @@ public class RobotContainer {
 
     
   }
-
   
 
   /**
@@ -159,16 +160,17 @@ public class RobotContainer {
    * Seta tambem o intake para saber qual elemento inicia no autonomo
    */
   public Command getAutonomousCommand() {
-    m_autoSelected = m_chooser.getSelected();
+   /*  m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
     m_autoSelectedElement = m_chooserElement.getSelected();
     System.out.println("element selected: " + m_autoSelectedElement.name());
     if(m_autoSelected==kTaxi){
-      return new AutoTaxi(m_autoSelectedElement);
+      return new AutoTaxi(Element.Cube);
     }
     if(m_autoSelected==kchargerStation){
-      return new AutoChargeStation(m_autoSelectedElement);
-    }
-    return null;
+      return new DriveBalance();
+    }*/
+
+    return new DriveBalance();
   }
 }

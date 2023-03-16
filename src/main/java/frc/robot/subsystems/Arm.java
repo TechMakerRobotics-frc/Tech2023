@@ -30,10 +30,11 @@ public class Arm extends SubsystemBase {
     motorRight.restoreFactoryDefaults();
 
     //Configuro para  que o  motor se mantenha estatico quando em 0
-    motorLeft.setIdleMode(IdleMode.kBrake);
-    motorRight.setIdleMode(IdleMode.kBrake);
+    motorLeft.setIdleMode(IdleMode.kCoast);
+    motorRight.setIdleMode(IdleMode.kCoast);
     //Configuro a rampa de aceleração para evitar picos de corrente
-    
+    motorLeft.setOpenLoopRampRate(ArmConstants.kRampRate);
+    motorRight.setOpenLoopRampRate(ArmConstants.kRampRate);
 
     //Inverto o motor da esquerda para que girem juntos
     motorLeft.setInverted(true);

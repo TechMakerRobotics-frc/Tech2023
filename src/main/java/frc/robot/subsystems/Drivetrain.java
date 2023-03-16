@@ -57,8 +57,8 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrivePoseEstimator m_poseEstimator;
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0 to 1.
-  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRate);
+  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateFoward);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DrivetrainConstants.kSlewRateTurn);
   private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
   private final PIDController m_leftPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
   private final PIDController m_rightPIDController = new PIDController(DrivetrainConstants.kDriveD,DrivetrainConstants.kDriveI, DrivetrainConstants.kDriveP);
@@ -184,9 +184,9 @@ public class Drivetrain extends SubsystemBase {
 
   // Função principal, movimenta o robo para frente e com curva
   public void setDriveMotors(double forward, double rotation) {
-    final var xSpeed = m_speedLimiter.calculate(forward);
+    final var xSpeed = forward;//m_speedLimiter.calculate(forward);
 
-    final var rot = m_rotLimiter.calculate(rotation);
+    final var rot = rotation;//m_rotLimiter.calculate(rotation);
 
     SmartDashboard.putNumber("Potencia Frente (%)", xSpeed * 100.0);
     SmartDashboard.putNumber("Potencia Curva (%)", rot * 100.0);
