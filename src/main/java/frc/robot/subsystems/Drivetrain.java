@@ -157,8 +157,9 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public void resetPose(Pose2d newPose) {
-    m_poseEstimator.resetPosition(m_gyro.getRotation2d(), leftEncoder1.getPosition(), rightEncoder1.getPosition(),
-        newPose);
+    
+    //m_poseEstimator.resetPosition(m_gyro.getRotation2d(), leftEncoder1.getPosition(), rightEncoder1.getPosition(),
+    //    newPose);
   }
 
   // Periodico só atualiza os dados no Dashboard para informações
