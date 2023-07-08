@@ -15,6 +15,7 @@ import frc.robot.Constants.ArmConstants;
 
 public class Arm extends SubsystemBase {
   private static Arm instance;
+  boolean extended = false;
   //Dois motores, um de  cada lado 
   CANSparkMax  motorLeft = new CANSparkMax(ArmConstants.kArmLeftMotor,MotorType.kBrushless);
   CANSparkMax  motorRight = new CANSparkMax (ArmConstants.kArmRighrMotor,MotorType.kBrushless);
@@ -57,10 +58,9 @@ public class Arm extends SubsystemBase {
   //Função principal que movimenta o braço para frente(+) e  para tras(-)
   public void setMotorPower(double forward) {
     SmartDashboard.putNumber("Braco Potencia (%)", forward * 100.0);
+      motorRight.set(forward);
+      motorLeft.set(forward);
     
-    
-    motorRight.set(forward);
-    motorLeft.set(forward);
     
   }
 

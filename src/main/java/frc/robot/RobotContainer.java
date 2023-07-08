@@ -7,7 +7,10 @@ import frc.robot.Constants.AuxiliarIntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoTaxi;
+import frc.robot.commands.AutonomousCmd;
 import frc.robot.commands.DriveBalance;
+import frc.robot.commands.ExtendArm;
+import frc.robot.commands.RetractArm;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.AuxiliarIntake;
 import frc.robot.subsystems.Drivetrain;
@@ -111,11 +114,12 @@ public class RobotContainer {
    */
   private void configureBindings() {
     //Seta a navegação padrão pelo  controle
-    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driver.getLeftY()*-1, 
-    //                          m_driver.getRightX()*-0.5), drive));
+     drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driver.getLeftY()*-1, 
+                              m_driver.getRightX()*-0.25), drive));
     //bResetOd.onTrue(new DriveBalance());
-    drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors((m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1)/2)*-1), 
-    m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1)/2)*-1), drive));
+    
+    //drive.setDefaultCommand(new RunCommand(()->drive.setDriveMotors(m_driverController.getRawAxis(1)*((m_driverController.getRawAxis(3)+1.0)/2.0)*-0.60, 
+     //                                         m_driverController.getRawAxis(2)*((m_driverController.getRawAxis(3)+1.0)/2.0)*-0.80), drive));
 
 
     bLightOff.onTrue(new InstantCommand(()->limeLight.ledOn() ,limeLight));
@@ -160,17 +164,13 @@ public class RobotContainer {
    * Seta tambem o intake para saber qual elemento inicia no autonomo
    */
   public Command getAutonomousCommand() {
-   /*  m_autoSelected = m_chooser.getSelected();
+     m_autoSelected = m_chooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
     m_autoSelectedElement = m_chooserElement.getSelected();
     System.out.println("element selected: " + m_autoSelectedElement.name());
     if(m_autoSelected==kTaxi){
-      return new AutoTaxi(Element.Cube);
+      return new AutonomousCmd(false,m_autoSelectedElement);
     }
-    if(m_autoSelected==kchargerStation){
-      return new DriveBalance();
-    }*/
-
-    return new DriveBalance();
+    return new AutonomousCmd(true, m_autoSelectedElement);
   }
 }

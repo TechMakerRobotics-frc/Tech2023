@@ -177,7 +177,9 @@ public class Drivetrain extends SubsystemBase {
         getRightDistanceMeters());
     updatePose();
   }
-
+  public void feed(){
+    m_diffDrive.feed();
+  }
   /*
    * Funcões de movimentação
    */

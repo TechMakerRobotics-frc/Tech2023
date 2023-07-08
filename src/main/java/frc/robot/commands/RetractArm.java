@@ -21,8 +21,8 @@ public class RetractArm extends SequentialCommandGroup {
   public RetractArm() {
     addCommands(
       new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPower),arm),
-      new WaitCommand(autonomousConstants.kExtendArmTime),
-      new InstantCommand(()->arm.setMotorPower(-ArmConstants.kPowerWait),arm),
+      new WaitCommand(autonomousConstants.kRetractArmTime),
+      new InstantCommand(()->arm.setMotorPower(0),arm),
       new InstantCommand(()->intake.setLedTeamColor(),intake)
     );
   }
