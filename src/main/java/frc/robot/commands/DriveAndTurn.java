@@ -14,7 +14,8 @@ public class DriveAndTurn extends SequentialCommandGroup {
   public DriveAndTurn(double distance, double angle) {
     Drivetrain drive = Drivetrain.getInstance();
     addCommands(
-      new ResetOdometry(),
+      new InstantCommand(()->drive.resetGyro(),drive),
+      new InstantCommand(()->drive.resetEncoders(),drive),
       new InstantCommand(()->drive.breake(true),drive),
       new DriveDistance(distance,drive),
       new WaitCommand(0.5),
